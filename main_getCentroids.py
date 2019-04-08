@@ -6,7 +6,7 @@ import elbow
 import time
 
 if __name__ == '__main__':
-    type = "oushi"
+    type = "mashi"
     # 读取数据
     channelDataPath = u'E:\\workspace\\keyan\\channelDate.xlsx'
     channelData = readAndWriteDataSet.excelToMatrix(channelDataPath)
@@ -19,20 +19,21 @@ if __name__ == '__main__':
 
     # 对协方差进行聚类
     k = 2
-    if "oushi" == type:
-        centroids, clusterAssment = kmeans.KMeansOushi(allCovMatrix, k)
-    else:
+    if "mashi" == type:
         centroids, clusterAssment = kmeans.KMeansMashi(allCovMatrix, k)
+    else:
+        centroids, clusterAssment = kmeans.KMeansOushi(allCovMatrix, k)
 
     # 分析PCA效果
     centroidList = getCovMatrix.matrixToMatrixList(centroids)
     newChannelData, newCovMatrixList = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, 0.8)
-
-    outOldCovMatrixListPath = "E:\\workspace\\keyan\\getCentroids_outOldCovMatrixList" + str(time.time()) + ".xlsx"
-    outCentroidListPath = "E:\\workspace\\keyan\\getCentroids_outCentroidList" + str(time.time()) + ".xlsx"
-    outClusterAssmentPath = "E:\\workspace\\keyan\\getCentroids_outClusterAssment" + str(time.time()) + ".xlsx"
-    outNewChannelDataPath = "E:\\workspace\\keyan\\getCentroids_outNewChannelData" + str(time.time()) + ".xlsx"
-    outNewCovMatrixListPath = "E:\\workspace\\keyan\\getCentroids_outNewCovMatrixList" + str(time.time()) + ".xlsx"
+    nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
+    outOldCovMatrixListPath = "E:\\workspace\\keyan\\getCentroids_outOldCovMatrixList_" + type + str(
+        nowTime) + ".xlsx"
+    outCentroidListPath = "E:\\workspace\\keyan\\getCentroids_outCentroidList_" + type + str(nowTime) + ".xlsx"
+    outClusterAssmentPath = "E:\\workspace\\keyan\\getCentroids_outClusterAssment_" + type + str(nowTime) + ".xlsx"
+    outNewChannelDataPath = "E:\\workspace\\keyan\\getCentroids_outNewChannelData_" + type + str(nowTime) + ".xlsx"
+    outNewCovMatrixListPath = "E:\\workspace\\keyan\\getCentroids_outNewCovMatrixList_" + type + str(nowTime) + ".xlsx"
 
     clusterAssmentList = []
     clusterAssmentList.append(clusterAssment)

@@ -2,6 +2,7 @@ import random
 import numpy as np
 import readAndWriteDataSet
 import getDistance
+import pandas as pd
 
 
 # 从数据中随机选择k个作为起始的中心点
@@ -71,6 +72,7 @@ def KMeansMashi(dataSet, k):
     # 第二列存样本的到簇的中心点的误差
     clusterAssment = np.mat(np.ones((m, 2)))
     clusterChange = True
+    # 存储每个簇中的数据
     dataSetOfCluster = []
     dataSetOfCluster.append(dataSetCopy)
     changeMatrixs = []
@@ -116,17 +118,28 @@ def KMeansMashi(dataSet, k):
 
         # 第 4 步：更新质心
         dataSetOfCluster.clear()
-        for j in range(k):
-            pointsInCluster = dataSetCopy[np.nonzero(clusterAssment[:, 0].A == j)[0]]  # 获取簇类所有的点
-            centroids[j, :] = np.mean(pointsInCluster, axis=0)  # 对矩阵的行求均值
+        for i in range(k):
+            pointsInCluster = dataSetCopy[np.nonzero(clusterAssment[:, 0].A == i)[0]]  # 获取簇类所有的点
+            centroids[i, :] = np.mean(pointsInCluster, axis=0)  # 对矩阵的行求均值
             dataSetOfCluster.append(pointsInCluster)
         for i in range(m):
             clusterAssment[i, 1] = getDistance.oushiDistance(centroids[int(clusterAssment[i, 0]), :], dataSetCopy[i, :])
 
     for i in range(len(changeMatrixs)):
-        centroids = np.dot(centroids, np.linalg.inv(changeMatrixs[len(changeMatrixs) - i - 1]))
+        IchangeMatrix = changeMatrixs[len(changeMatrixs) - i - 1]
+        for j in range(n):
+            if IchangeMatrix[j, j] != 0:
+                IchangeMatrix[j, j] = IchangeMatrix[j, j] ** -1
+            else:
+                IchangeMatrix[j, j] = IchangeMatrix[j, j]
+        centroids = np.dot(centroids, IchangeMatrix)
+    # 以下三行是计算马氏距离所需
+    allData = np.concatenate((dataSet, centroids))
+    covMatrix = np.cov(allData, rowvar=False)
+    IcovMatrix = np.linalg.inv(covMatrix)
     for i in range(m):
-        clusterAssment[i, 1] = getDistance.oushiDistance(centroids[int(clusterAssment[i, 0]), :], dataSet[i, :])
+        clusterAssment[i, 1] = getDistance.mashiDistance(centroids[int(clusterAssment[i, 0]), :], dataSet[i, :],
+                                                         IcovMatrix)
     print("Congratulations,cluster complete!")
     print("centroids:\n", centroids)
     print("clusterAssment:\n", clusterAssment)
@@ -148,12 +161,18 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
 
         # 遍历所有的中心点
         # 第2步 找出最近的中心点
+
+        # 以下三行是计算马氏距离所需
+        allData = np.concatenate((dataSet, centroids))
+        covMatrix = np.cov(allData, rowvar=False)
+        IcovMatrix = np.linalg.inv(covMatrix)
+
         for j in range(k):
             # 计算该样本到质心的欧式距离
-            if "oushi" == type:
-                distance = getDistance.oushiDistance(centroids[j, :], dataSet[i, :])
+            if "mashi" == type:
+                distance = getDistance.mashiDistance(centroids[j, :], dataSet[i, :], IcovMatrix)
             else:
-                distance = getDistance.mashiDistance(centroids[j, :], dataSet[i, :])
+                distance = getDistance.oushiDistance(centroids[j, :], dataSet[i, :])
             if distance < minDist:
                 minDist = distance
                 minIndex = j
