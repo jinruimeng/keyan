@@ -5,12 +5,15 @@ import pca
 import time
 
 if __name__ == '__main__':
-    type = "mashi"
-    channelDataPath = u'E:\\workspace\\keyan\\channelDate.xlsx'
-    centroidListPath = u'E:\\workspace\\keyan\\getCentroids_outCentroidList.xlsx'
+    type = "oushi"
+    path = "/Users/jinruimeng/Downloads/keyan/"
+    # path = "E:\\workspace\\keyan\\"
 
-    centroidList = readAndWriteDataSet.excelToMatrix(centroidListPath)
-    channelData = readAndWriteDataSet.excelToMatrix(channelDataPath)
+    channelDataPath = path + "channelDate.xlsx"
+    centroidListPath = path + "getCentroids_outCentroidList.xlsx"
+
+    centroidList = readAndWriteDataSet.excelToMatrixList(centroidListPath)
+    channelData = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     # 计算出信道数据的协方差
     centroids = getCovMatrix.matrixListToMatrix(centroidList)
@@ -24,10 +27,10 @@ if __name__ == '__main__':
     newChannelData, newCovMatrixs = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, 0.8)
 
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    outOldCovMatrixListPath = "E:\\workspace\\keyan\\cluster_outOldCovMatrixList_" + type + str(nowTime) + ".xlsx"
-    outClusterAssmentPath = "E:\\workspace\\keyan\\cluster_outClusterAssment_" + type + str(nowTime) + ".xlsx"
-    outNewChannelDataPath = "E:\\workspace\\keyan\\cluster_outNewChannelData_" + type + str(nowTime) + ".xlsx"
-    outNewCovMatrixsPath = "E:\\workspace\\keyan\\cluster_outNewCovMatrixList_" + type + str(nowTime) + ".xlsx"
+    outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + str(nowTime) + ".xlsx"
+    outClusterAssmentPath = path + "cluster_outClusterAssment_" + type + str(nowTime) + ".xlsx"
+    outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + str(nowTime) + ".xlsx"
+    outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + str(nowTime) + ".xlsx"
     clusterAssmentList = []
     clusterAssmentList.append(clusterAssment)
 

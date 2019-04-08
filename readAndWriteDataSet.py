@@ -4,11 +4,11 @@ import numpy as np
 import xlrd
 
 
-# 每个工作簿作为一组（信道）数据
-def excelToMatrix(path):
+# 每个工作簿作为一组数据，放到list中
+def excelToMatrixList(path):
     wb = xlrd.open_workbook(path)
     sheets: List[Any] = wb.sheets()
-    matrixs = []
+    matrixList = []
     for k in range(len(sheets)):
         table = sheets[k]  # 获取一个sheet表
         row = table.nrows  # 行数
@@ -17,12 +17,12 @@ def excelToMatrix(path):
         for x in range(row):
             rows = np.matrix(table.row_values(x))
             matrix[x, :] = rows
-        matrixs.append(matrix)
-    return matrixs
+        matrixList.append(matrix)
+    return matrixList
 
 
-# 每个工作簿作为一组（协方差）数据
-def excelToMatrix2(path):
+# 每个工作簿作为一行数据，放到一个矩阵中
+def excelToMatrix(path):
     wb = xlrd.open_workbook(path)
     sheets: List[Any] = wb.sheets()
     matrix = np.mat(np.zeros((len(sheets), sheets[0].nrows * sheets[0].ncols)))
@@ -37,8 +37,8 @@ def excelToMatrix2(path):
     return matrix
 
 
-# 工作簿的每一行作为一组(协方差)数据
-def excelToMatrix3(path, k=0):
+# 读取第一个工作薄
+def excelToMatrix2(path, k=0):
     wb = xlrd.open_workbook(path)
     sheets: List[Any] = wb.sheets()
     table = sheets[k]

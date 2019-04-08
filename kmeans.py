@@ -1,8 +1,8 @@
 import random
 import numpy as np
-import readAndWriteDataSet
 import getDistance
-import pandas as pd
+import readAndWriteDataSet
+import time
 
 
 # 从数据中随机选择k个作为起始的中心点
@@ -133,10 +133,23 @@ def KMeansMashi(dataSet, k):
             else:
                 IchangeMatrix[j, j] = IchangeMatrix[j, j]
         centroids = np.dot(centroids, IchangeMatrix)
+
     # 以下三行是计算马氏距离所需
     allData = np.concatenate((dataSet, centroids))
     covMatrix = np.cov(allData, rowvar=False)
     IcovMatrix = np.linalg.inv(covMatrix)
+
+    # outMatrixList = []
+    # outMatrixList.append(allData)
+    # outMatrixList.append(covMatrix)
+    # outMatrixList.append(IcovMatrix)
+    # path = "/Users/jinruimeng/Downloads/keyan/"
+    # # path = "E:\\workspace\\keyan\\"
+    # nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
+    # outSomeMatrixListPath = path + "getCentroids_outSomeMatrixList_mashi" + str(
+    #     nowTime) + ".xlsx"
+    # readAndWriteDataSet.write(outMatrixList, outSomeMatrixListPath)
+
     for i in range(m):
         clusterAssment[i, 1] = getDistance.mashiDistance(centroids[int(clusterAssment[i, 0]), :], dataSet[i, :],
                                                          IcovMatrix)
@@ -153,6 +166,21 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
     # 第一列存样本属于哪一簇
     # 第二列存样本的到簇的中心点的误差
     clusterAssment = np.mat(np.ones((m, 2)))
+    # 以下三行是计算马氏距离所需
+    allData = np.concatenate((dataSet, centroids))
+    covMatrix = np.cov(allData, rowvar=False)
+    IcovMatrix = np.linalg.inv(covMatrix)
+
+    # outMatrixList = []
+    # outMatrixList.append(allData)
+    # outMatrixList.append(covMatrix)
+    # outMatrixList.append(IcovMatrix)
+    # path = "/Users/jinruimeng/Downloads/keyan/"
+    # # path = "E:\\workspace\\keyan\\"
+    # nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
+    # outSomeMatrixListPath = path + "cluster_outSomeMatrixList_" + type + str(
+    #     nowTime) + ".xlsx"
+    # readAndWriteDataSet.write(outMatrixList, outSomeMatrixListPath)
 
     # 遍历所有的样本（行数）
     for i in range(m):
@@ -161,14 +189,8 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
 
         # 遍历所有的中心点
         # 第2步 找出最近的中心点
-
-        # 以下三行是计算马氏距离所需
-        allData = np.concatenate((dataSet, centroids))
-        covMatrix = np.cov(allData, rowvar=False)
-        IcovMatrix = np.linalg.inv(covMatrix)
-
         for j in range(k):
-            # 计算该样本到质心的欧式距离
+            # 计算该样本到质心的距离
             if "mashi" == type:
                 distance = getDistance.mashiDistance(centroids[j, :], dataSet[i, :], IcovMatrix)
             else:
