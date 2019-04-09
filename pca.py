@@ -32,10 +32,10 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
         #            np.dot(covMatrixs[i],
         #                   np.linalg.inv(VTs[(int)(clusterAssment[i, 0])]))))
         newCovMatrixList.append(
-            np.dot(VTs[(int)(clusterAssment[i, 0])],
+            np.dot(VTs[(int)(clusterAssment[i, 0].real)],
                    np.dot(covMatrixList[i],
-                          np.transpose(VTs[(int)(clusterAssment[i, 0])]))))
-        newChannelData.append(np.dot(channelData[i], np.transpose(VTs[(int)(clusterAssment[i, 0])])))
+                          np.transpose(VTs[(int)(clusterAssment[i, 0].real)]))))
+        newChannelData.append(np.dot(channelData[i], np.transpose(VTs[(int)(clusterAssment[i, 0].real)])))
 
     return newChannelData, newCovMatrixList
 

@@ -13,7 +13,7 @@ def excelToMatrixList(path):
         table = sheets[k]  # 获取一个sheet表
         row = table.nrows  # 行数
         col = table.ncols  # 列数
-        matrix = np.mat(np.zeros((row, col)))
+        matrix = np.array(np.zeros((row, col)), dtype=complex)
         for x in range(row):
             rows = np.matrix(table.row_values(x))
             matrix[x, :] = rows
@@ -25,7 +25,7 @@ def excelToMatrixList(path):
 def excelToMatrix(path):
     wb = xlrd.open_workbook(path)
     sheets: List[Any] = wb.sheets()
-    matrix = np.mat(np.zeros((len(sheets), sheets[0].nrows * sheets[0].ncols)))
+    matrix = np.array(np.zeros((len(sheets), sheets[0].nrows * sheets[0].ncols)), dtype=complex)
     for k in range(len(sheets)):
         table = sheets[k]  # 获取第一个sheet表
         row = table.nrows  # 行数
@@ -37,14 +37,14 @@ def excelToMatrix(path):
     return matrix
 
 
-# 读取第一个工作薄
+# 读取第一个工作薄，放到一个矩阵中
 def excelToMatrix2(path, k=0):
     wb = xlrd.open_workbook(path)
     sheets: List[Any] = wb.sheets()
     table = sheets[k]
     row = table.nrows  # 行数
     col = table.ncols  # 列数
-    matrix = np.zeros((row, col))  # 生成一个nrows行ncols列，且元素均为0的初始矩阵
+    matrix = np.array(np.zeros((row, col)), dtype=complex)  # 生成一个nrows行ncols列，且元素均为0的初始矩阵
     for x in range(col):
         cols = np.matrix(table.col_values(x))  # 把list转换为矩阵进行矩阵操作
         matrix[:, x] = cols  # 按列把数据存进矩阵中
@@ -60,5 +60,14 @@ def write(outData, path):
         worksheet = workbook.add_worksheet()  # 创建sheet
         for j in range(h):
             for k in range(l):
-                worksheet.write(j, k, outData[i][j, k])
+                tmp = str(outData[i][j, k])
+                worksheet.write_string(j, k, tmp)
     workbook.close()
+
+
+if __name__ == '__main__':
+    datafile = u'E:\\workspace\\keyan\\test.xlsx'
+    dataSet = np.array(excelToMatrixList(datafile))
+    # str = "1+2j"
+    # com = complex(str)
+    # print(com)

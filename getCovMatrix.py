@@ -14,7 +14,7 @@ def getCovMatrixList(matrixs):
 
 def matrixListToMatrix(covMatrixs):
     m, n = np.shape(covMatrixs[0])
-    allCovMatrix = np.mat(np.zeros((len(covMatrixs), (int)(0.5 * (n ** 2 + n)))))
+    allCovMatrix = np.array(np.zeros((len(covMatrixs), (int)(0.5 * (n ** 2 + n)))), dtype=complex)
     for i in range(len(covMatrixs)):
         curMatrix = covMatrixs[i]
         cur = 0
@@ -31,7 +31,7 @@ def matrixToMatrixList(allCovMatrix):
     m, n = np.shape(allCovMatrix)
     p = (int)(0.5 * ((1 + 8 * n) ** 0.5 - 1))
     for i in range(m):
-        curMatrix = np.zeros((p, p))
+        curMatrix = np.array(np.zeros((p, p)), dtype=complex)
         curRow = 0
         curCol = 0
         for j in range(n):

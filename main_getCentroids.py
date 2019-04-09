@@ -7,10 +7,10 @@ import time
 
 if __name__ == '__main__':
     type = "oushi"
-    path = "/Users/jinruimeng/Downloads/keyan/"
-    # path = "E:\\workspace\\keyan\\"
+    # path = "/Users/jinruimeng/Downloads/keyan/"
+    path = "E:\\workspace\\keyan\\"
     # 读取数据
-    channelDataPath = path + "channelDate.xlsx"
+    channelDataPath = path + "channelData.xlsx"
     channelData = readAndWriteDataSet.excelToMatrixList(channelDataPath)
     # 得到协方差的集合，并把协方差放到一个矩阵中
     covMatrixList = getCovMatrix.getCovMatrixList(channelData)

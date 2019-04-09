@@ -6,10 +6,10 @@ import time
 
 if __name__ == '__main__':
     type = "oushi"
-    path = "/Users/jinruimeng/Downloads/keyan/"
-    # path = "E:\\workspace\\keyan\\"
+    # path = "/Users/jinruimeng/Downloads/keyan/"
+    path = "E:\\workspace\\keyan\\"
 
-    channelDataPath = path + "channelDate.xlsx"
+    channelDataPath = path + "channelData.xlsx"
     centroidListPath = path + "getCentroids_outCentroidList.xlsx"
 
     centroidList = readAndWriteDataSet.excelToMatrixList(centroidListPath)

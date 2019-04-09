@@ -9,7 +9,7 @@ import time
 # 数据维度为n，数量为m
 def randCent(dataSet, k):
     m, n = dataSet.shape  # 查看dataSet的维数
-    centroids = np.zeros((k, n))
+    centroids = np.array(np.zeros((k, n)), dtype=complex)
     rs = random.sample(range(0, m), k)  # 在0~m范围内生成k个随机数[0,m)
     for i in range(len(rs)):
         centroids[i, :] = dataSet[rs[i], :]
@@ -22,7 +22,7 @@ def KMeansOushi(dataSet, k):
     m = np.shape(dataSet)[0]  # 行的数目
     # 第一列存样本属于哪一簇
     # 第二列存样本的到簇的中心点的误差
-    clusterAssment = np.mat(np.ones((m, 2)))
+    clusterAssment = np.matrix(np.ones((m, 2)), dtype=complex)
     clusterChange = True
 
     # 第1步 初始化centroids
@@ -54,7 +54,8 @@ def KMeansOushi(dataSet, k):
             pointsInCluster = dataSet[np.nonzero(clusterAssment[:, 0].A == j)[0]]  # 获取簇类所有的点
             centroids[j, :] = np.mean(pointsInCluster, axis=0)  # 对矩阵的行求均值
         for i in range(m):
-            clusterAssment[i, 1] = getDistance.oushiDistance(centroids[int(clusterAssment[i, 0]), :], dataSet[i, :])
+            clusterAssment[i, 1] = getDistance.oushiDistance(centroids[int(clusterAssment[i, 0].real), :],
+                                                             dataSet[i, :])
 
     print("Congratulations,cluster complete!")
     print("centroids:\n", centroids)
@@ -165,7 +166,7 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
     k = np.shape(centroids)[0]  # 中心点的数量
     # 第一列存样本属于哪一簇
     # 第二列存样本的到簇的中心点的误差
-    clusterAssment = np.mat(np.ones((m, 2)))
+    clusterAssment = np.array(np.ones((m, 2)), dtype=complex)
     # 以下三行是计算马氏距离所需
     allData = np.concatenate((dataSet, centroids))
     covMatrix = np.cov(allData, rowvar=False)
