@@ -52,17 +52,26 @@ def excelToMatrix2(path, k=0):
 
 
 # 将数据存储成excel
-def write(outData, path):
-    workbook = xlsxwriter.Workbook(path)  # 创建一个Excel文件
-    m = len(outData)
-    for i in range(m):
-        [h, l] = outData[i].shape
-        worksheet = workbook.add_worksheet()  # 创建sheet
-        for j in range(h):
-            for k in range(l):
-                tmp = str(outData[i][j, k])
-                worksheet.write_string(j, k, tmp)
-    workbook.close()
+def write(outData, path, suffix=".xlsx"):
+    if ".xlsx" == suffix:
+        workbook = xlsxwriter.Workbook(path)  # 创建一个Excel文件
+        m = len(outData)
+        # buff = 0
+        for i in range(m):
+            # if buff > 10000:
+            #     workbook.close()
+            #     workbook = xlrd.open_workbook(path)
+            #     buff = 0
+            [h, l] = outData[i].shape
+            worksheet = workbook.add_worksheet()  # 创建sheet
+            for j in range(h):
+                for k in range(l):
+                    tmp = str(outData[i][j, k])
+                    worksheet.write_string(j, k, tmp)
+                    # buff += 1
+        workbook.close()
+    if ".npy" == suffix:
+        np.save(path, outData)
 
 
 if __name__ == '__main__':

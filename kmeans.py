@@ -58,8 +58,8 @@ def KMeansOushi(dataSet, k):
                                                              dataSet[i, :])
 
     print("Congratulations,cluster complete!")
-    print("centroids:\n", centroids)
-    print("clusterAssment:\n", clusterAssment)
+    # print("centroids:\n", centroids)
+    # print("clusterAssment:\n", clusterAssment)
     return centroids, clusterAssment
 
 
@@ -167,10 +167,6 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
     # 第一列存样本属于哪一簇
     # 第二列存样本的到簇的中心点的误差
     clusterAssment = np.array(np.ones((m, 2)), dtype=complex)
-    # 以下三行是计算马氏距离所需
-    allData = np.concatenate((dataSet, centroids))
-    covMatrix = np.cov(allData, rowvar=False)
-    IcovMatrix = np.linalg.inv(covMatrix)
 
     # outMatrixList = []
     # outMatrixList.append(allData)
@@ -193,6 +189,10 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
         for j in range(k):
             # 计算该样本到质心的距离
             if "mashi" == type:
+                # 以下三行是计算马氏距离所需
+                allData = np.concatenate((dataSet, centroids))
+                covMatrix = np.cov(allData, rowvar=False)
+                IcovMatrix = np.linalg.inv(covMatrix)
                 distance = getDistance.mashiDistance(centroids[j, :], dataSet[i, :], IcovMatrix)
             else:
                 distance = getDistance.oushiDistance(centroids[j, :], dataSet[i, :])
