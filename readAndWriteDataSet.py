@@ -54,14 +54,16 @@ def excelToMatrix2(path, k=0):
 # 将数据存储成excel
 def write(outData, path, suffix=".xlsx"):
     if ".xlsx" == suffix:
-        workbook = xlsxwriter.Workbook(path)  # 创建一个Excel文件
         m = len(outData)
-        # buff = 0
+        buff = 0
+        bn = 1;
+        workbook = xlsxwriter.Workbook(path + "_0" + suffix)  # 创建一个Excel文件
         for i in range(m):
-            # if buff > 10000:
-            #     workbook.close()
-            #     workbook = xlrd.open_workbook(path)
-            #     buff = 0
+            if buff > 10000:
+                workbook.close()
+                workbook = xlrd.open_workbook(path + "_" + str(bn) + suffix)
+                buff = 0
+                bn += 1
             [h, l] = outData[i].shape
             worksheet = workbook.add_worksheet()  # 创建sheet
             for j in range(h):

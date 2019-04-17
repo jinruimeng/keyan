@@ -4,6 +4,7 @@
     <list default="true" id="c668b303-db4e-4c46-93f3-9379826701ac" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_getCentroids.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_getCentroids.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readAndWriteDataSet.py" beforeDir="false" afterPath="$PROJECT_DIR$/readAndWriteDataSet.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,13 +22,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main_getCentroids.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="64" column="65" lean-forward="true" selection-start-line="64" selection-start-column="65" selection-end-line="64" selection-end-column="65" />
+            <state relative-caret-position="133">
+              <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/readAndWriteDataSet.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="133">
+              <caret line="59" column="26" lean-forward="true" selection-start-line="59" selection-start-column="26" selection-end-line="59" selection-end-column="26" />
+              <folding>
+                <element signature="e#0#28#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -36,8 +49,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/getDistance.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="11" column="36" lean-forward="true" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
+            <state relative-caret-position="190">
+              <caret line="11" column="36" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -62,12 +75,12 @@
       <list>
         <option value="$PROJECT_DIR$/getCovMatrix.py" />
         <option value="$PROJECT_DIR$/elbow.py" />
-        <option value="$PROJECT_DIR$/readAndWriteDataSet.py" />
         <option value="$PROJECT_DIR$/pca.py" />
         <option value="$PROJECT_DIR$/kmeans.py" />
         <option value="$PROJECT_DIR$/main_cluster.py" />
         <option value="$PROJECT_DIR$/getDistance.py" />
         <option value="$PROJECT_DIR$/main_getCentroids.py" />
+        <option value="$PROJECT_DIR$/readAndWriteDataSet.py" />
       </list>
     </option>
   </component>
@@ -210,12 +223,13 @@
       <workItem from="1555291619405" duration="11754000" />
       <workItem from="1555314283683" duration="3061000" />
       <workItem from="1555379597208" duration="4321000" />
-      <workItem from="1555464779965" duration="1486000" />
+      <workItem from="1555464779965" duration="1913000" />
+      <workItem from="1555469173126" duration="4103000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="44531000" />
+    <option name="totallyTimeSpent" value="49061000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -228,13 +242,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="916" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49615383" visible="true" weight="0.28534704" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49615383" visible="true" weight="0.28920308" />
       <window_info id="Structure" order="1" sideWeight="0.5034325" side_tool="true" weight="0.32223904" />
       <window_info id="Favorites" order="2" sideWeight="0.50384617" side_tool="true" weight="0.27662337" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49924356" visible="true" weight="0.34398976" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49924356" weight="0.34398976" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.36189258" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -243,7 +258,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3276923" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50075644" side_tool="true" weight="0.45692307" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32352942" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.32352942" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.32909605" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -371,16 +386,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/readAndWriteDataSet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="59" column="26" lean-forward="true" selection-start-line="59" selection-start-column="26" selection-end-line="59" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Anaconda3/Lib/site-packages/numpy/core/_methods.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
@@ -427,8 +432,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/getDistance.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="11" column="36" lean-forward="true" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
+        <state relative-caret-position="190">
+          <caret line="11" column="36" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -437,10 +442,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main_getCentroids.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="64" column="65" lean-forward="true" selection-start-line="64" selection-start-column="65" selection-end-line="64" selection-end-column="65" />
+        <state relative-caret-position="133">
+          <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/readAndWriteDataSet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="59" column="26" lean-forward="true" selection-start-line="59" selection-start-column="26" selection-end-line="59" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>

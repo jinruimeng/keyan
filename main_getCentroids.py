@@ -1,3 +1,4 @@
+import multiprocessing
 import readAndWriteDataSet
 import getCovMatrix
 import kmeans
@@ -5,7 +6,6 @@ import pca
 import elbow
 import time
 import numpy as np
-import multiprocessing
 
 
 def getCentroids(type, path, suffix, channelData, g, k):
@@ -16,14 +16,14 @@ def getCentroids(type, path, suffix, channelData, g, k):
 
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     outOldCovMatrixListPath = path + "getCentroids_outOldCovMatrixList_" + type + str(g) + str(
-        nowTime) + suffix
-    outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime) + suffix
+        nowTime)
+    outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime)
     outClusterAssmentPath = path + "getCentroids_outClusterAssment_" + type + "_" + str(g) + "_" + str(
-        nowTime) + suffix
+        nowTime)
     outNewChannelDataPath = path + "getCentroids_outNewChannelData_" + type + "_" + str(g) + "_" + str(
-        nowTime) + suffix
+        nowTime)
     outNewCovMatrixListPath = path + "getCentroids_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(
-        nowTime) + suffix
+        nowTime)
     readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath)
 
     # 利用肘部法选择聚类中心个数

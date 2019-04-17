@@ -28,10 +28,10 @@ def cluster(type, path, suffix, channelData, g):
     # 输出
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(
-        nowTime) + suffix
-    outClusterAssmentPath = path + "cluster_outClusterAssment_" + type + "_" + str(g) + "_" + str(nowTime) + suffix
-    outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime) + suffix
-    outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime) + suffix
+        nowTime)
+    outClusterAssmentPath = path + "cluster_outClusterAssment_" + type + "_" + str(g) + "_" + str(nowTime)
+    outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
+    outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
     readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath)
     readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath)
     readAndWriteDataSet.write(newChannelData, outNewChannelDataPath)
