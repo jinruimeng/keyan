@@ -15,7 +15,7 @@ def getCentroids(type, path, suffix, channelData, g, k):
     allCovMatrix = getCovMatrix.matrixListToMatrix(covMatrixList)
 
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    outOldCovMatrixListPath = path + "getCentroids_outOldCovMatrixList_" + type + str(g) + str(
+    outOldCovMatrixListPath = path + "getCentroids_outOldCovMatrixList_" + type + "_" + str(g) + str(
         nowTime)
     outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime)
     outClusterAssmentPath = path + "getCentroids_outClusterAssment_" + type + "_" + str(g) + "_" + str(
@@ -38,13 +38,13 @@ def getCentroids(type, path, suffix, channelData, g, k):
     clusterAssmentList = []
     clusterAssmentList.append(clusterAssment)
     centroidList = getCovMatrix.matrixToMatrixList(centroids)
+    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
+    readAndWriteDataSet.write(centroidList, outCentroidListPath, suffix)
 
     # 分析PCA效果
     newChannelData, newCovMatrixList = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, 1)
 
     # 输出
-    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
-    readAndWriteDataSet.write(centroidList, outCentroidListPath, suffix)
     readAndWriteDataSet.write(newChannelData, outNewChannelDataPath, suffix)
     readAndWriteDataSet.write(newCovMatrixList, outNewCovMatrixListPath, suffix)
     print("第" + str(g) + "轮结束！")
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     p = len(channelDataAll)  # 页数
     a = 5  # 拆分成2^a份
     sub = n >> a
-    k = 8  # 聚类中心数量
+    k = 3  # 聚类中心数量
     ps = multiprocessing.Pool(4)
 
     for g in range(1 << a):

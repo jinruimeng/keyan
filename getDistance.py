@@ -11,7 +11,7 @@ def oushiDistance(x, y):
 
 def mashiDistance(x, y, IcovMatrix):
     dif = x - y
-    distance = math.fabs(np.dot(dif, np.dot(IcovMatrix, np.transpose(dif))))
+    distance = abs(np.dot(dif, np.dot(IcovMatrix, np.transpose(dif))))
     return distance
 
 

@@ -2,7 +2,6 @@ import random
 import numpy as np
 import getDistance
 import readAndWriteDataSet
-import time
 
 
 # 从数据中随机选择k个作为起始的中心点
@@ -24,10 +23,14 @@ def KMeansOushi(dataSet, k):
     # 第二列存样本的到簇的中心点的误差
     clusterAssment = np.matrix(np.ones((m, 2)), dtype=complex)
     clusterChange = True
+    count = 0
 
     # 第1步 初始化centroids
     centroids = randCent(dataSet, k)
     while clusterChange:
+        count += 1
+        print("第" + str(count) + "次寻找聚类中心！")
+        count2 = 0
         clusterChange = False
 
         # 遍历所有的样本（行数）
@@ -46,16 +49,19 @@ def KMeansOushi(dataSet, k):
 
             # 第 3 步：更新每一行样本所属的簇
             if clusterAssment[i, 0] != minIndex:
-                clusterChange = True
+                count2 += 1
             clusterAssment[i, :] = minIndex, minDist
 
         # 第 4 步：更新质心
         for j in range(k):
             pointsInCluster = dataSet[np.nonzero(clusterAssment[:, 0].A == j)[0]]  # 获取簇类所有的点
-            centroids[j, :] = np.mean(pointsInCluster, axis=0)  # 对矩阵的行求均值
+            if np.shape(pointsInCluster)[0] > 0:
+                centroids[j, :] = np.mean(pointsInCluster, axis=0)  # 对矩阵的行求均值
         for i in range(m):
             clusterAssment[i, 1] = getDistance.oushiDistance(centroids[int(clusterAssment[i, 0].real), :],
                                                              dataSet[i, :])
+        if count2 > m >> 3:
+            clusterChange = True
 
     print("Congratulations,cluster complete!")
     # print("centroids:\n", centroids)

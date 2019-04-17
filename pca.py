@@ -6,12 +6,12 @@ import readAndWriteDataSet
 def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
     # Us = []
     VTs = []
-    newChannelData = []
+    newChannelDataList = []
     newCovMatrixList = []
 
     # 计算变换矩阵
     for i in range(len(centroidList)):
-        U, Sigma, VT = np.linalg.svd(centroidList[i])
+        U, Sigma, VT = np.linalg.svd(centroidList[i], full_matrices=0)
         sum = np.sum(Sigma)
         curSum = 0
         index = 0
@@ -31,13 +31,15 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
         #     np.dot(np.linalg.inv(Us[(int)(clusterAssment[i, 0])]),
         #            np.dot(covMatrixs[i],
         #                   np.linalg.inv(VTs[(int)(clusterAssment[i, 0])]))))
-        newCovMatrixList.append(
-            np.dot(VTs[(int)(clusterAssment[i, 0].real)],
-                   np.dot(covMatrixList[i],
-                          np.transpose(VTs[(int)(clusterAssment[i, 0].real)]))))
-        newChannelData.append(np.dot(channelData[i], np.transpose(VTs[(int)(clusterAssment[i, 0].real)])))
+        # newCovMatrixList.append(
+        #     np.dot(VTs[(int)(clusterAssment[i, 0].real)],
+        #            np.dot(covMatrixList[i],
+        #                   np.transpose(VTs[(int)(clusterAssment[i, 0].real)]))))
+        newChannelData = np.dot(channelData[i], np.transpose(VTs[(int)(clusterAssment[i, 0].real)]))
+        newChannelDataList.append(newChannelData)
+        newCovMatrixList.append(np.cov(newChannelData, rowvar=False))
 
-    return newChannelData, newCovMatrixList
+    return newChannelDataList, newCovMatrixList
 
 
 if __name__ == '__main__':
