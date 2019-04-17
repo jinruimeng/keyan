@@ -10,6 +10,13 @@ import multiprocessing
 def cluster(type, path, suffix, channelData, g):
     print("第" + str(g) + "轮开始！")
     centroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_.xlsx"
+    nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
+    outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(
+        nowTime)
+    outClusterAssmentPath = path + "cluster_outClusterAssment_" + type + "_" + str(g) + "_" + str(nowTime)
+    outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
+    outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
+
     centroidList = readAndWriteDataSet.excelToMatrixList(centroidListPath)
 
     # 计算出信道数据的协方差
@@ -23,19 +30,13 @@ def cluster(type, path, suffix, channelData, g):
     clusterAssmentList.append(clusterAssment)
 
     # 分析PCA效果
-    newChannelData, newCovMatrixs = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, 0.8)
+    newChannelData, newCovMatrixs = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, 1)
 
     # 输出
-    nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(
-        nowTime)
-    outClusterAssmentPath = path + "cluster_outClusterAssment_" + type + "_" + str(g) + "_" + str(nowTime)
-    outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
-    outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
-    readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath)
-    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath)
-    readAndWriteDataSet.write(newChannelData, outNewChannelDataPath)
-    readAndWriteDataSet.write(newCovMatrixs, outNewCovMatrixsPath)
+    readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath, suffix)
+    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
+    readAndWriteDataSet.write(newChannelData, outNewChannelDataPath, suffix)
+    readAndWriteDataSet.write(newCovMatrixs, outNewCovMatrixsPath, suffix)
     print("第" + str(g) + "轮结束！")
 
 
@@ -44,7 +45,7 @@ if __name__ == '__main__':
     # path = "/Users/jinruimeng/Downloads/keyan/"
     path = "E:\\workspace\\keyan\\"
     suffix = ".xlsx"
-    channelDataPath = path + "channelData1.xlsx"
+    channelDataPath = path + "channelDataC.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数

@@ -7,7 +7,8 @@ import readAndWriteDataSet
 def getCovMatrixList(matrixs):
     covMatrixList = []
     for i in range(len(matrixs)):
-        covMatrix = np.cov(matrixs[i], rowvar=False)
+        # covMatrix = np.cov(matrixs[i], rowvar=False)
+        covMatrix = np.corrcoef(matrixs[i], rowvar=False)
         covMatrixList.append(covMatrix)
     return covMatrixList
 
