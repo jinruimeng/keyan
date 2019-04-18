@@ -7,10 +7,18 @@ import readAndWriteDataSet
 def getCovMatrixList(matrixs):
     covMatrixList = []
     for i in range(len(matrixs)):
-        # covMatrix = np.cov(matrixs[i], rowvar=False)
-        covMatrix = np.corrcoef(matrixs[i], rowvar=False)
+        covMatrix = np.cov(matrixs[i], rowvar=False)
         covMatrixList.append(covMatrix)
     return covMatrixList
+
+# in:list形式的信道数据
+# out:list形式的相关系数矩阵
+def getCorrMatrixList(matrixs):
+    corrMatrixList = []
+    for i in range(len(matrixs)):
+        corrMatrix = np.corrcoef(matrixs[i], rowvar=False)
+        corrMatrixList.append(corrMatrix)
+    return corrMatrixList
 
 
 def matrixListToMatrix(covMatrixs):

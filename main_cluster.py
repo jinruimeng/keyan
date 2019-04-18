@@ -11,16 +11,21 @@ def cluster(type, path, suffix, channelData, g):
     print("第" + str(g) + "轮开始！")
     centroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_.xlsx"
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(
+    outOldCorrMatrixListPath = path + "cluster_outOldCorrMatrixList_" + type + "_" + str(g) + "_" + str(
         nowTime)
     outClusterAssmentPath = path + "cluster_outClusterAssment_" + type + "_" + str(g) + "_" + str(nowTime)
     outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
     outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
 
+    # 读入聚类中心信息
     centroidList = readAndWriteDataSet.excelToMatrixList(centroidListPath)
-
-    # 计算出信道数据的协方差
     centroids = getCovMatrix.matrixListToMatrix(centroidList)
+
+    # 计算信道相关系数矩阵,并输出
+    corrMatrixList = getCovMatrix.getCorrMatrixList(channelData)
+    readAndWriteDataSet.write(corrMatrixList, outOldCorrMatrixListPath, suffix)
+
+    # 计算信道数据的协方差
     covMatrixList = getCovMatrix.getCovMatrixList(channelData)
     allCovMatrix = getCovMatrix.matrixListToMatrix(covMatrixList)
 
@@ -29,12 +34,13 @@ def cluster(type, path, suffix, channelData, g):
     clusterAssmentList = []
     clusterAssmentList.append(clusterAssment)
 
+    # 输出聚类结果
+    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
+
     # 分析PCA效果
     newChannelData, newCovMatrixs = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, 1)
 
-    # 输出
-    readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath, suffix)
-    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
+    # 输出PCA结果
     readAndWriteDataSet.write(newChannelData, outNewChannelDataPath, suffix)
     readAndWriteDataSet.write(newCovMatrixs, outNewCovMatrixsPath, suffix)
     print("第" + str(g) + "轮结束！")

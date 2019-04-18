@@ -6,7 +6,8 @@ import math
 # numpy.sum(a, axis=None, dtype=None, out=None, keepdims=False 求一个数组中给定轴上的元素的总和
 # **代表乘方
 def oushiDistance(x, y):
-    return np.sum(np.square(x - y))  # 计算欧氏距离的平方
+    return np.sum(abs(x - y))  # 计算欧氏距离的平方
+    # return abs(np.corrcoef(x, y))  # 计算相关系数的绝对值
 
 
 def mashiDistance(x, y, IcovMatrix):
