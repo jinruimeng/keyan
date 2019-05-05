@@ -4,31 +4,37 @@ import readAndWriteDataSet
 
 # in:list形式的信道数据
 # out:list形式的协方差
-def getCovMatrixList(matrixs):
+def getCovMatrixList(matrixList):
     covMatrixList = []
-    for i in range(len(matrixs)):
-        covMatrix = np.cov(matrixs[i], rowvar=False)
+    for i in range(len(matrixList)):
+        covMatrix = np.cov(matrixList[i], rowvar=False)
+        # covMatrix = np.corrcoef(matrixs[i], rowvar=False)
         covMatrixList.append(covMatrix)
     return covMatrixList
 
+
 # in:list形式的信道数据
 # out:list形式的相关系数矩阵
-def getCorrMatrixList(matrixs):
+def getCorrMatrixList(matrixList):
     corrMatrixList = []
-    for i in range(len(matrixs)):
-        corrMatrix = np.corrcoef(matrixs[i], rowvar=False)
+    for i in range(len(matrixList)):
+        corrMatrix = np.corrcoef(matrixList[i], rowvar=False)
         corrMatrixList.append(corrMatrix)
     return corrMatrixList
 
 
-def matrixListToMatrix(covMatrixs):
-    m, n = np.shape(covMatrixs[0])
-    allCovMatrix = np.array(np.zeros((len(covMatrixs), (int)(0.5 * (n ** 2 + n)))), dtype=complex)
-    for i in range(len(covMatrixs)):
-        curMatrix = covMatrixs[i]
+def matrixListToMatrix(covMatrixList):
+    m, n = np.shape(covMatrixList[0])
+    allCovMatrix = np.array(np.zeros((len(covMatrixList), (int)(0.5 * (n ** 2 + n)))), dtype=complex)
+    for i in range(len(covMatrixList)):
+        curMatrix = covMatrixList[i]
         cur = 0
         for j in range(n):
             for k in range(j, n):
+                # if curMatrix[j, k] >= 0.1:
+                #     allCovMatrix[i, cur] = curMatrix[j, k]
+                # else:
+                #     allCovMatrix[i, cur] = 0
                 allCovMatrix[i, cur] = curMatrix[j, k]
                 cur += 1
     return allCovMatrix
@@ -52,6 +58,20 @@ def matrixToMatrixList(allCovMatrix):
                 curCol = curRow
         covMatrixList.append(curMatrix)
     return covMatrixList
+
+
+def getInformations(covMatrixList):
+    informations = []
+    information = np.array(np.zeros((len(covMatrixList), 1)), dtype=complex)
+    for i in range(len(covMatrixList)):
+        try:
+            U, Sigma, VT = np.linalg.svd(covMatrixList[i], full_matrices=0)
+            sum = np.sum(Sigma)
+        except:
+            sum = covMatrixList[i]
+        information[i, 0] = sum
+    informations.append(information)
+    return informations
 
 
 if __name__ == '__main__':
