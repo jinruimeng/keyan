@@ -69,7 +69,7 @@ if __name__ == '__main__':
     ps = multiprocessing.Pool(4)
     a = 5  # 拆分成2^a份
     sub = n >> a
-    k = 3  # 聚类中心数量
+    k = 1  # 聚类中心数量
     iRate = 0.9
 
     for g in range(1 << a):

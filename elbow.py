@@ -57,13 +57,13 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
 
 if __name__ == '__main__':
     type = "oushi"
-    iRate = 0.9
+    iRate = 0.99
     path = "/Users/jinruimeng/Downloads/keyan/"
     # path = "E:\\workspace\\keyan\\"
 
     # 读取数据
-    channelDataPath = path + "channelDataP4.xlsx"
+    channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
-    a = 5
+    a = 1
     elbow(channelDataAll, 1, 8, a, iRate, type="oushi")

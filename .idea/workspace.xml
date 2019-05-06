@@ -4,11 +4,7 @@
     <list default="true" id="c668b303-db4e-4c46-93f3-9379826701ac" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/elbow.py" beforeDir="false" afterPath="$PROJECT_DIR$/elbow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/getCovMatrix.py" beforeDir="false" afterPath="$PROJECT_DIR$/getCovMatrix.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_cluster.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_cluster.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_getCentroids.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_getCentroids.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pca.py" beforeDir="false" afterPath="$PROJECT_DIR$/pca.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readAndWriteDataSet.py" beforeDir="false" afterPath="$PROJECT_DIR$/readAndWriteDataSet.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,8 +15,8 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/keyan$readAndWriteDataSet.coverage" NAME="readAndWriteDataSet Coverage Results" MODIFIED="1554790114339" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/keyan$main_cluster.coverage" NAME="main_cluster Coverage Results" MODIFIED="1555316742751" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/keyan$main_getCentroids.coverage" NAME="main_getCentroids Coverage Results" MODIFIED="1556939995474" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/keyan$elbow.coverage" NAME="elbow Coverage Results" MODIFIED="1557038275578" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/keyan$main_getCentroids.coverage" NAME="main_getCentroids Coverage Results" MODIFIED="1557040316144" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/keyan$elbow.coverage" NAME="elbow Coverage Results" MODIFIED="1557109244797" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -44,10 +40,31 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/elbow.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="236">
-              <caret line="61" column="37" lean-forward="true" selection-start-line="61" selection-start-column="37" selection-end-line="61" selection-end-column="37" />
+            <state relative-caret-position="582">
+              <caret line="68" column="17" selection-start-line="68" selection-start-column="17" selection-end-line="68" selection-end-column="17" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/kmeans.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1050">
+              <caret line="73" column="11" selection-start-line="73" selection-start-column="11" selection-end-line="73" selection-end-column="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main_getCentroids.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="855">
+              <caret line="63" column="42" selection-start-line="63" selection-start-column="42" selection-end-line="63" selection-end-column="42" />
+              <folding>
+                <element signature="e#0#22#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -77,17 +94,17 @@
         <option value="$PROJECT_DIR$/kmeans.py" />
         <option value="$PROJECT_DIR$/getDistance.py" />
         <option value="$PROJECT_DIR$/readAndWriteDataSet.py" />
-        <option value="$PROJECT_DIR$/main_getCentroids.py" />
         <option value="$PROJECT_DIR$/main_cluster.py" />
         <option value="$PROJECT_DIR$/pca.py" />
         <option value="$PROJECT_DIR$/getCovMatrix.py" />
+        <option value="$PROJECT_DIR$/main_getCentroids.py" />
         <option value="$PROJECT_DIR$/elbow.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="36" />
-    <option name="y" value="87" />
+    <option name="x" value="71" />
+    <option name="y" value="48" />
     <option name="width" value="1440" />
     <option name="height" value="840" />
   </component>
@@ -97,7 +114,17 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="keyan" type="b2602c69:ProjectViewProjectNode" />
+              <item name="keyan" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -253,12 +280,13 @@
       <workItem from="1556951592633" duration="5966000" />
       <workItem from="1556973392883" duration="2161000" />
       <workItem from="1557017918357" duration="4545000" />
-      <workItem from="1557037803760" duration="1164000" />
+      <workItem from="1557037803760" duration="3213000" />
+      <workItem from="1557105203887" duration="3509000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="86799000" />
+    <option name="totallyTimeSpent" value="92357000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -270,9 +298,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="36" y="87" width="1440" height="840" extended-state="0" />
+    <frame x="71" y="48" width="1440" height="840" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49615383" visible="true" weight="0.13876967" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49615383" visible="true" weight="0.14020029" />
       <window_info id="Structure" order="1" sideWeight="0.5034325" side_tool="true" weight="0.32223904" />
       <window_info id="Favorites" order="2" sideWeight="0.50384617" side_tool="true" weight="0.27662337" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -286,12 +314,12 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32650602" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50075644" side_tool="true" weight="0.45692307" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.4318182" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.4318182" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.32909605" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" visible="true" weight="0.30829757" />
+      <window_info active="true" anchor="right" id="SciView" order="3" visible="true" weight="0.38268957" />
       <window_info anchor="right" id="Database" order="4" weight="0.3297568" />
     </layout>
   </component>
@@ -416,23 +444,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/kmeans.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="898">
-          <caret line="73" column="11" lean-forward="true" selection-start-line="73" selection-start-column="11" selection-end-line="73" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main_getCentroids.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1065">
-          <caret line="71" column="9" selection-start-line="71" selection-start-column="9" selection-end-line="71" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main_cluster.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="372">
@@ -493,10 +504,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/elbow.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="61" column="37" lean-forward="true" selection-start-line="61" selection-start-column="37" selection-end-line="61" selection-end-column="37" />
+        <state relative-caret-position="582">
+          <caret line="68" column="17" selection-start-line="68" selection-start-column="17" selection-end-line="68" selection-end-column="17" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kmeans.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1050">
+          <caret line="73" column="11" selection-start-line="73" selection-start-column="11" selection-end-line="73" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main_getCentroids.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="855">
+          <caret line="63" column="42" selection-start-line="63" selection-start-column="42" selection-end-line="63" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>
