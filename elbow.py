@@ -19,7 +19,7 @@ def elbow(channelDataAll, low, high, a, iRate, type="oushi"):
     ps.join()
     X = range(low, high + 1)
     plt.xlabel('k')
-    plt.ylabel('SSE')
+    plt.ylabel("信息量保留")
     plt.plot(X, SSE, 'o-')
     plt.show()
     print("主进程结束！")
@@ -57,7 +57,7 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
 
 if __name__ == '__main__':
     type = "oushi"
-    iRate = 9
+    iRate = 8
     # path = "/Users/jinruimeng/Downloads/keyan/"
     path = "E:\\workspace\\keyan\\"
 
