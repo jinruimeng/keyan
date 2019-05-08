@@ -10,7 +10,7 @@ import pca
 def elbow(channelDataAll, low, high, a, iRate, type="oushi"):
     '利用SSE选择k'
     SSE = []  # 存放每次结果
-    ps = multiprocessing.Pool(4)
+    ps = multiprocessing.Pool(2)
     for i in range(low, high + 1):
         SSE.append(ps.apply_async(elbowCore, args=(channelDataAll, i, a, iRate, type)).get())
         # SSE.append(elbowCore(channelDataAll, i, a, iRate, type))
@@ -57,13 +57,13 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
 
 if __name__ == '__main__':
     type = "oushi"
-    iRate = 0.99
-    path = "/Users/jinruimeng/Downloads/keyan/"
-    # path = "E:\\workspace\\keyan\\"
+    iRate = 9
+    # path = "/Users/jinruimeng/Downloads/keyan/"
+    path = "E:\\workspace\\keyan\\"
 
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
-    a = 1
+    a = 2
     elbow(channelDataAll, 1, 8, a, iRate, type="oushi")

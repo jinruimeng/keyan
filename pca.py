@@ -22,12 +22,15 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
         sum = np.sum(Sigma)
         curSum = 0
         index = 0
-        for j in range(len(Sigma)):
-            curSum += Sigma[j]
-            if rate - (curSum / sum) > 0:
-                index += 1
-            else:
-                break
+        if rate <= 1:
+            for j in range(len(Sigma)):
+                curSum += Sigma[j]
+                if rate - (curSum / sum) > 0:
+                    index += 1
+                else:
+                    break
+        else:
+            index = rate - 1
         # U2 = U[:, 0:index]
         # Us.append(U2)
         VTs.append(VT)
