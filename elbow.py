@@ -10,7 +10,7 @@ import pca
 def elbow(channelDataAll, low, high, a, iRate, type="oushi"):
     '利用SSE选择k'
     SSE = []  # 存放每次结果
-    ps = multiprocessing.Pool(2)
+    ps = multiprocessing.Pool(4)
     for i in range(low, high + 1):
         SSE.append(ps.apply_async(elbowCore, args=(channelDataAll, i, a, iRate, type)).get())
         # SSE.append(elbowCore(channelDataAll, i, a, iRate, type))
