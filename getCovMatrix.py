@@ -8,7 +8,7 @@ def getCovMatrixList(matrixList):
     covMatrixList = []
     for i in range(len(matrixList)):
         covMatrix = np.cov(matrixList[i], rowvar=False)
-        # covMatrix = np.corrcoef(matrixs[i], rowvar=False)
+        # covMatrix = np.corrcoef(matrixList[i], rowvar=False)
         covMatrixList.append(covMatrix)
     return covMatrixList
 

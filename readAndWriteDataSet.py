@@ -59,9 +59,9 @@ def write(outData, path, suffix=".xlsx"):
         bn = 1
         workbook = xlsxwriter.Workbook(path + "_0" + suffix)  # 创建一个Excel文件
         for i in range(m):
-            if buff > 10000:
+            if buff >= 1800000:
                 workbook.close()
-                workbook = xlrd.open_workbook(path + "_" + str(bn) + suffix)
+                workbook = xlsxwriter.Workbook(path + "_" + str(bn) + suffix)
                 buff = 0
                 bn += 1
             [h, l] = outData[i].shape
@@ -70,7 +70,7 @@ def write(outData, path, suffix=".xlsx"):
                 for k in range(l):
                     tmp = str(outData[i][j, k])
                     worksheet.write_string(j, k, tmp)
-                    # buff += 1
+                    buff += 1
         workbook.close()
     if ".npy" == suffix:
         np.save(path, outData)

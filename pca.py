@@ -9,12 +9,10 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
     VTs = []
     VT2s = []
     newChannelDataAllList = []
-    # newCovMatrixAll2List = []
-    # rates = []
-    rates2 = np.array(np.zeros((len(channelData), 2)), dtype=complex)
-    # rates3 = []
+    rates = np.array(np.zeros((len(channelData), 2)), dtype=complex)
     rateList = []
     newChannelDataList = []
+    newCovMatrixList = []
 
     # 计算变换矩阵
     for i in range(len(centroidList)):
@@ -51,28 +49,27 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
         newChannelDataAllList.append(newChannelDataAll)
 
         index = np.shape(VT2s[(int)(clusterAssment[i, 0].real)])[0]
-        rates2[i, 0] = index
+        rates[i, 0] = index
         newChannelData = newChannelDataAll[:, 0:index]
         newChannelDataList.append(newChannelData)
 
     newCovMatrixAllList = getCovMatrix.getCovMatrixList(newChannelDataAllList)
     newInformationAll = getCovMatrix.getInformations(newCovMatrixAllList)
 
-    # for i in range(len(newCovMatrixAllList)):
-    #     newCovMatrixAll2 = newCovMatrixAllList[i][0:index + 1, 0:index + 1]
-    #     newCovMatrixAll2List.append(newCovMatrixAll2)
-    # newInformation = getCovMatrix.getInformations(newCovMatrixAll2List)
-    # for i in range(len(newInformationAll)):
-    #     rate = newInformation[i] / newInformationAll[i]
-    #     rates.append(rate)
+    for i in range(len(newCovMatrixAllList)):
+        index = np.shape(VT2s[(int)(clusterAssment[i, 0].real)])[0]
+        newCovMatrix = newCovMatrixAllList[i][0:index, 0:index]
+        newCovMatrixList.append(newCovMatrix)
+    newInformation = getCovMatrix.getInformations(newCovMatrixList)
 
-    newCovMatrixList = getCovMatrix.getCovMatrixList(newChannelDataList)
-    newInformation2 = getCovMatrix.getInformations(newCovMatrixList)
+    # newCovMatrixList = getCovMatrix.getCovMatrixList(newChannelDataList)
+    # newInformation = getCovMatrix.getInformations(newCovMatrixList)
+
     for i in range(len(channelData)):
-        rate = newInformation2[0][i] / newInformationAll[0][i]
-        rates2[i, 1] = rate
+        rate = newInformation[0][i] / newInformationAll[0][i]
+        rates[i, 1] = rate
 
-    rateList.append(rates2)
+    rateList.append(rates)
     return newChannelDataList, newCovMatrixList, VT2s, rateList
 
 
