@@ -48,7 +48,7 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
         centroidList = getCovMatrix.matrixToMatrixList(centroids)
 
         # 分析PCA效果,计算信息量保留程度
-        tmpRates = np.mean(pca.pca(channelData, covMatrixList, centroidList, clusterAssment, iRate)[3][0][:, 1])
+        tmpRates = np.min(pca.pca(channelData, covMatrixList, centroidList, clusterAssment, iRate)[3][0][:, 1])
         rates.append(tmpRates)
 
     rate = np.mean(rates)

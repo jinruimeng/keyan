@@ -56,8 +56,8 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
 
 if __name__ == '__main__':
     type = "oushi"
-    # path = "/Users/jinruimeng/Downloads/keyan/"
-    path = "E:\\workspace\\keyan\\"
+    path = "/Users/jinruimeng/Downloads/keyan/"
+    # path = "E:\\workspace\\keyan\\"
     suffix = ".xlsx"
 
     # 读取数据
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
-    a = 3  # 拆分成2^a份
+    a = 2  # 拆分成2^a份
     sub = n >> a
     k = 1  # 聚类中心数量
     iRate = 10
@@ -77,8 +77,8 @@ if __name__ == '__main__':
         for i in range(p):
             channelDataPage = channelDataAll[i]
             channelData.append(channelDataPage[:, g * sub:(g + 1) * sub])
-        ps.apply_async(getCentroids, args=(type, path, suffix, channelData, g, k, iRate))
-        # getCentroids(type, path, suffix, channelData, g, k,iRate)
+        # ps.apply_async(getCentroids, args=(type, path, suffix, channelData, g, k, iRate))
+        getCentroids(type, path, suffix, channelData, g, k,iRate)
 
     ps.close()
     ps.join()
