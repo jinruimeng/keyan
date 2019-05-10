@@ -57,9 +57,9 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
 
 if __name__ == '__main__':
     type = "oushi"
-    iRate = 8
-    # path = "/Users/jinruimeng/Downloads/keyan/"
-    path = "E:\\workspace\\keyan\\"
+    iRate = 10
+    path = "/Users/jinruimeng/Downloads/keyan/"
+    # path = "E:\\workspace\\keyan\\"
 
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"

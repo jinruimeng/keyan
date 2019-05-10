@@ -56,14 +56,14 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
     newCovMatrixAllList = getCovMatrix.getCovMatrixList(newChannelDataAllList)
     newInformationAll = getCovMatrix.getInformations(newCovMatrixAllList)
 
-    for i in range(len(newCovMatrixAllList)):
-        index = np.shape(VT2s[(int)(clusterAssment[i, 0].real)])[0]
-        newCovMatrix = newCovMatrixAllList[i][0:index, 0:index]
-        newCovMatrixList.append(newCovMatrix)
-    newInformation = getCovMatrix.getInformations(newCovMatrixList)
-
-    # newCovMatrixList = getCovMatrix.getCovMatrixList(newChannelDataList)
+    # for i in range(len(newCovMatrixAllList)):
+    #     index = np.shape(VT2s[(int)(clusterAssment[i, 0].real)])[0]
+    #     newCovMatrix = newCovMatrixAllList[i][0:index, 0:index]
+    #     newCovMatrixList.append(newCovMatrix)
     # newInformation = getCovMatrix.getInformations(newCovMatrixList)
+
+    newCovMatrixList = getCovMatrix.getCovMatrixList(newChannelDataList)
+    newInformation = getCovMatrix.getInformations(newCovMatrixList)
 
     for i in range(len(channelData)):
         rate = newInformation[0][i] / newInformationAll[0][i]
