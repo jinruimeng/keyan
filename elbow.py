@@ -67,7 +67,7 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
 
 if __name__ == '__main__':
     type = "oushi"
-    iRate = 20
+    iRate = 15
     # path = "/Users/jinruimeng/Downloads/keyan/"
     path = "E:\\workspace\\keyan\\"
 
