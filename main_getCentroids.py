@@ -56,8 +56,8 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
 
 if __name__ == '__main__':
     type = "oushi"
-    # path = "/Users/jinruimeng/Downloads/keyan/"
-    path = "E:\\workspace\\keyan\\"
+    path = "/Users/jinruimeng/Downloads/keyan/"
+    # path = "E:\\workspace\\keyan\\"
     suffix = ".xlsx"
 
     # 读取数据
