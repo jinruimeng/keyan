@@ -60,7 +60,7 @@ def KMeansOushi(dataSet, k):
         for i in range(m):
             clusterAssment[i, 1] = getDistance.oushiDistance(centroids[int(clusterAssment[i, 0].real), :],
                                                              dataSet[i, :])
-        if count2 > m >> 3:
+        if count2 > 0:
             clusterChange = True
 
     print("Congratulations,cluster complete!")

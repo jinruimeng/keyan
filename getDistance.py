@@ -6,7 +6,15 @@ import math
 # numpy.sum(a, axis=None, dtype=None, out=None, keepdims=False 求一个数组中给定轴上的元素的总和
 # **代表乘方
 def oushiDistance(x, y):
-    return np.sum(abs(x - y))  # 计算欧氏距离的平方
+    # sum = 0
+    # for i in range(len(x)):
+    #     if i > 0 and ((abs(x[i]) - abs(x[i - 1])) * (abs(y[i]) - abs(y[i - 1])) < 0):
+    #             sum += abs(x[i] - y[i]) * 5
+    #     else:
+    #         sum += abs(x[i] - y[i])
+
+    sum = np.sum(abs(x - y))
+    return sum
     # return abs(np.corrcoef(x, y))  # 计算相关系数的绝对值
 
 

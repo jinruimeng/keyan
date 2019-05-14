@@ -66,8 +66,8 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
     # newInformation = getCovMatrix.getInformations(newCovMatrixList)
 
     for i in range(len(channelData)):
-        rate = newInformation[0][i] / newInformationAll[0][i]
-        rates[i, 1] = rate
+        rate2 = newInformation[0][i] / newInformationAll[0][i]
+        rates[i, 1] = rate2
 
     rateList.append(rates)
     return newChannelDataList, newCovMatrixList, VT2s, rateList

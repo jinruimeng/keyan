@@ -7,17 +7,17 @@ import kmeans
 import pca
 
 
-def elbow(channelDataAll, low, high, a, iRate, type="oushi"):
+def elbow(channelDataAll, low, high, step, a, iRate, type="oushi"):
     '利用SSE选择k'
     SSE = []  # 存放每次结果
     ps = multiprocessing.Pool(4)
-    for i in range(low, high + 1):
+    for i in range(low, high + 1, step):
         SSE.append(ps.apply_async(elbowCore, args=(channelDataAll, i, a, iRate, type)).get())
         # SSE.append(elbowCore(channelDataAll, i, a, iRate, type))
 
     ps.close()
     ps.join()
-    X = range(low, high + 1)
+    X = range(low, high + 1, step)
     plt.xlabel('k')
     plt.ylabel("信息量保留")
     plt.plot(X, SSE, 'o-')
@@ -33,8 +33,8 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
 
     for g in range(1 << a):
         channelData = []
-        for i in range(p):
-            channelDataPage = channelDataAll[i]
+        for h in range(p):
+            channelDataPage = channelDataAll[h]
             channelData.append(channelDataPage[:, g * sub:(g + 1) * sub])
 
         covMatrixList = getCovMatrix.getCovMatrixList(channelData)
@@ -48,16 +48,26 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
         centroidList = getCovMatrix.matrixToMatrixList(centroids)
 
         # 分析PCA效果,计算信息量保留程度
-        tmpRates = np.mean(pca.pca(channelData, covMatrixList, centroidList, clusterAssment, iRate)[3][0][:, 1])
-        rates.append(tmpRates)
+        tmpRates = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, iRate)[3][0][:, 1]
+
+        rates.append(np.mean(tmpRates))
+        # rates.append(min(tmpRates))
+
+        # count = 0
+        # for i in range(len(tmpRates)):
+        #     if tmpRates[i] < 0.8:
+        #         count += 1
+        # rates.append(count)
 
     rate = np.mean(rates)
+    # rate = np.min(rates)
+
     return rate.real
 
 
 if __name__ == '__main__':
     type = "oushi"
-    iRate = 8
+    iRate = 20
     # path = "/Users/jinruimeng/Downloads/keyan/"
     path = "E:\\workspace\\keyan\\"
 
@@ -65,5 +75,5 @@ if __name__ == '__main__':
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
-    a = 2
-    elbow(channelDataAll, 1, 8, a, iRate, type="oushi")
+    a = 3
+    elbow(channelDataAll, 3, 30, 3, a, iRate, type="oushi")

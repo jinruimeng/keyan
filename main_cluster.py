@@ -52,17 +52,17 @@ def cluster(type, path, suffix, channelData, g, iRate):
 
 if __name__ == '__main__':
     type = "oushi"
-    path = "/Users/jinruimeng/Downloads/keyan/"
-    # path = "E:\\workspace\\keyan\\"
+    # path = "/Users/jinruimeng/Downloads/keyan/"
+    path = "E:\\workspace\\keyan\\"
     suffix = ".xlsx"
-    channelDataPath = path + "channelDataC.xlsx"
+    channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
-    a = 5  # 拆分成2^a份
+    a = 3  # 拆分成2^a份
     sub = n >> a
-    iRate = 0.9
+    iRate = 10
 
     for g in range(1 << a):
         channelData = []
