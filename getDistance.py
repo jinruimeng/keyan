@@ -13,7 +13,7 @@ def oushiDistance(x, y):
     #     else:
     #         sum += abs(x[i] - y[i])
 
-    sum = np.sum(abs(x - y))
+    sum = np.linalg.norm((x - y))
     return sum
     # return abs(np.corrcoef(x, y))  # 计算相关系数的绝对值
 

@@ -56,18 +56,18 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
 
 if __name__ == '__main__':
     type = "oushi"
-    path = "/Users/jinruimeng/Downloads/keyan/"
-    # path = "E:\\workspace\\keyan\\"
+    # path = "/Users/jinruimeng/Downloads/keyan/"
+    path = "E:\\workspace\\keyan\\"
     suffix = ".xlsx"
 
     # 读取数据
-    channelDataPath = path + "channelDataP.xlsx"
+    channelDataPath = path + "channelDataP_TU 5m.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
-    a = 2  # 拆分成2^a份
+    a = 3  # 拆分成2^a份
     sub = n >> a
     k = 1  # 聚类中心数量
     iRate = 15
