@@ -1,3 +1,6 @@
+#支持中文显示
+from pylab import *
+mpl.rcParams['font.sans-serif'] = ['SimHei']
 import matplotlib.pyplot as plt
 import readAndWriteDataSet
 import multiprocessing
@@ -18,7 +21,7 @@ def elbow(channelDataAll, low, high, step, a, iRate, type="oushi"):
     ps.close()
     ps.join()
     X = range(low, high + 1, step)
-    plt.xlabel('k')
+    plt.xlabel("聚类中心数量")
     plt.ylabel("信息量保留")
     plt.plot(X, SSE, 'o-')
     plt.show()
@@ -67,7 +70,8 @@ def elbowCore(channelDataAll, i, a, iRate, type="oushi"):
 
 if __name__ == '__main__':
     type = "oushi"
-    iRate = 20
+    a = 2
+    iRate = 5
     # path = "/Users/jinruimeng/Downloads/keyan/"
     path = "E:\\workspace\\keyan\\"
 
@@ -75,5 +79,4 @@ if __name__ == '__main__':
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
-    a = 3
-    elbow(channelDataAll, 1, 51, 5, a, iRate, type="oushi")
+    elbow(channelDataAll, 1, 12, 1, a, iRate, type="oushi")

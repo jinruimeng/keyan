@@ -61,7 +61,7 @@ if __name__ == '__main__':
     suffix = ".xlsx"
 
     # 读取数据
-    channelDataPath = path + "channelDataP_TU 5m.xlsx"
+    channelDataPath = path + "channelDataP_PedA 2m.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     n = np.shape(channelDataAll[0])[1]  # 列数
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     ps = multiprocessing.Pool(4)
     a = 3  # 拆分成2^a份
     sub = n >> a
-    k = 1  # 聚类中心数量
+    k = 5  # 聚类中心数量
     iRate = 15
 
     for g in range(1 << a):
