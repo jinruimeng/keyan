@@ -5,11 +5,12 @@ import pca
 import time
 import numpy as np
 import multiprocessing
+import os
 
 
 def cluster(type, path, suffix, channelData, g, iRate):
     print("第" + str(g) + "轮开始！")
-    centroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_.xlsx"
+    centroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_"
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
     # outOldInformationsPath = path + "cluster_outOldInformations_" + type + "_" + str(g) + "_" + str(nowTime)
@@ -17,10 +18,19 @@ def cluster(type, path, suffix, channelData, g, iRate):
     outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
     outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
     # outNewInformationsPath = path + "cluster_outNewInformation_" + type + "_" + str(g) + "_" + str(nowTime)
+    ratesPath = path + "cluster_rates_" + type + "_" + str(g) + "_" + str(nowTime)
     VTsPath = path + "cluster_VTs_" + type + "_" + str(g) + "_" + str(nowTime)
 
     # 读入聚类中心信息
-    centroidList = readAndWriteDataSet.excelToMatrixList(centroidListPath)
+    centroidList = []
+    for root, dirs, files in os.walk(path, topdown=True):
+        for file in files:
+            file = os.path.join(root, file)
+            if centroidListPath in file:
+                centroidListTmp = readAndWriteDataSet.excelToMatrixList(file)
+                for centroid in centroidListTmp:
+                    centroidList.append(centroid)
+        break
     centroids = getCovMatrix.matrixListToMatrix(centroidList)
 
     # 计算信道相关系数矩阵并输出，然后放到一个矩阵中
@@ -39,7 +49,8 @@ def cluster(type, path, suffix, channelData, g, iRate):
     readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
 
     # 分析PCA效果
-    newChannelData, newCovMatrixList, VTs = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, iRate)
+    newChannelData, newCovMatrixList, VTs, rates = pca.pca(channelData, covMatrixList, centroidList, clusterAssment,
+                                                           iRate)
     # newInformations = getCovMatrix.getInformations(newCovMatrixList)
 
     # 输出PCA结果
@@ -47,6 +58,7 @@ def cluster(type, path, suffix, channelData, g, iRate):
     readAndWriteDataSet.write(newCovMatrixList, outNewCovMatrixsPath, suffix)
     # readAndWriteDataSet.write(newInformations, outNewInformationsPath, suffix)
     readAndWriteDataSet.write(VTs, VTsPath, suffix)
+    readAndWriteDataSet.write(rates, ratesPath, suffix)
     print("第" + str(g) + "轮结束！")
 
 
@@ -60,9 +72,9 @@ if __name__ == '__main__':
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
-    a = 3  # 拆分成2^a份
+    a = 2  # 拆分成2^a份
     sub = n >> a
-    iRate = 10
+    iRate = 5
 
     for g in range(1 << a):
         channelData = []
@@ -70,7 +82,7 @@ if __name__ == '__main__':
             channelDataPage = channelDataAll[i]
             channelData.append(channelDataPage[:, g * sub:(g + 1) * sub])
         ps.apply_async(cluster, args=(type, path, suffix, channelData, g, iRate))
-
+        # cluster(type, path, suffix, channelData, g, iRate)
     ps.close()
     ps.join()
     print("主进程结束！")
