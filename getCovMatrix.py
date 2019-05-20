@@ -40,6 +40,29 @@ def matrixListToMatrix(covMatrixList):
     return allCovMatrix
 
 
+def matrixListToMatrix_U(UList):
+    try:
+        m, n = np.shape(UList[0])
+        allU = np.array(np.zeros((len(UList), (int)(m * n))), dtype=complex)
+        for i in range(len(UList)):
+            curU = UList[i]
+            cur = 0
+            for j in range(m):
+                for k in range(n):
+                    allU[i, cur] = curU[j, k]
+                    cur += 1
+    except:
+        m = np.shape(UList[0])[0]
+        allU = np.array(np.zeros((len(UList), (int)(m))), dtype=complex)
+        for i in range(len(UList)):
+            curU = UList[i]
+            cur = 0
+            for j in range(m):
+                allU[i, cur] = curU[j]
+                cur += 1
+    return allU
+
+
 def matrixToMatrixList(allCovMatrix):
     covMatrixList = []
     # m个协方差矩阵，每个协方差矩阵是p*p的
@@ -58,6 +81,19 @@ def matrixToMatrixList(allCovMatrix):
                 curCol = curRow
         covMatrixList.append(curMatrix)
     return covMatrixList
+
+
+def matrixToMatrixList_U(allU):
+    UList = []
+    # m个变换矩阵，每个变换矩阵是p*p的
+    m, n = np.shape(allU)
+    p = (int)(n ** 0.5)
+    for i in range(m):
+        U = np.array(np.zeros((p, p)), dtype=complex)
+        for j in range(p):
+            U[j, :] = allU[i, j * p:(j + 1) * p]
+        UList.append(U)
+    return UList
 
 
 def getInformations(covMatrixList):

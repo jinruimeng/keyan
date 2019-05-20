@@ -69,6 +69,67 @@ def KMeansOushi(dataSet, k):
     return centroids, clusterAssment
 
 
+# k均值聚类
+# 根据加权距离聚类
+def KMeansOushi_U(dataSet, k, weights, newDimension):
+    m, n = np.shape(dataSet)  # 行的数目
+    p = (int)(n ** 0.5)
+    if newDimension > p:
+        newDimension = p
+    # 第一列存样本属于哪一簇
+    # 第二列存样本的到簇的中心点的误差
+    clusterAssment = np.matrix(np.ones((m, 2)), dtype=complex)
+    clusterChange = True
+    count = 0
+
+    # 第1步 初始化centroids
+    centroids = randCent(dataSet, k)
+    while clusterChange:
+        count += 1
+        print("第" + str(count) + "次寻找聚类中心！")
+        count2 = 0
+        clusterChange = False
+
+        # 遍历所有的样本（行数）
+        for i in range(m):
+            minDist = 100000000.0
+            minIndex = -1
+            # 遍历所有的质心
+            # 第2步 找出最近的质心
+            for j in range(k):
+                # 计算该样本到质心的加权距离
+                distance = 0
+                for a in range(p):
+                    distance + getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension],
+                                                         dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
+                if distance < minDist:
+                    minDist = distance
+                    minIndex = j
+
+            # 第 3 步：更新每一行样本所属的簇
+            if clusterAssment[i, 0] != minIndex:
+                count2 += 1
+            clusterAssment[i, :] = minIndex, minDist
+
+        # 第 4 步：更新质心
+        for j in range(k):
+            pointsInCluster = dataSet[np.nonzero(clusterAssment[:, 0].A == j)[0]]  # 获取簇类所有的点
+            if np.shape(pointsInCluster)[0] > 0:
+                centroids[j, :] = np.mean(pointsInCluster, axis=0)  # 对矩阵的行求均值
+        for i in range(m):
+            distance = 0
+            for j in range(newDimension):
+                distance += getDistance.oushiDistance(
+                    centroids[int(clusterAssment[i, 0].real), j * p:j * p + newDimension],
+                    dataSet[i, j * p:j * p + newDimension]) * weights[i, j]
+            clusterAssment[i, 1] = distance
+        if count2 > 0:
+            clusterChange = True
+
+    print("Congratulations,cluster complete!")
+    return centroids, clusterAssment
+
+
 # 根据马氏距离聚类
 def KMeansMashi(dataSet, k):
     # 备份原数据

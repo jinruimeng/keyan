@@ -4,7 +4,7 @@ import readAndWriteDataSet
 import getCovMatrix
 
 
-def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
+def pca(channelData, centroidList, clusterAssment, rate=1):
     # Us = []
     VTs = []
     VT2s = []
@@ -71,6 +71,59 @@ def pca(channelData, covMatrixList, centroidList, clusterAssment, rate=1):
 
     rateList.append(rates)
     return newChannelDataList, newCovMatrixList, VT2s, rateList
+
+
+def pca_U(channelDataList, centroidList, clusterAssment, newDimension=1):
+    newChannelDataAllList = []
+    newChannelDataList = []
+    U2s = []
+
+    rates = np.array(np.zeros((len(channelDataList), 2)), dtype=complex)
+    # 为了输出，要把rates放到list中
+    rateList = []
+
+    # 计算变换矩阵
+    for i in range(len(centroidList)):
+        U2 = centroidList[i][:, 0:newDimension]
+        U2s.append(U2)
+
+    # 降维
+    for i in range(len(channelDataList)):
+        newChannelDataAll = np.dot(channelDataList[i], centroidList[(int)(clusterAssment[i, 0].real)])
+        newChannelDataAllList.append(newChannelDataAll)
+
+        index = np.shape(U2s[(int)(clusterAssment[i, 0].real)])[1]
+        rates[i, 0] = index
+        newChannelData = newChannelDataAll[:, 0:index]
+        newChannelDataList.append(newChannelData)
+
+    newCovMatrixAllList = getCovMatrix.getCovMatrixList(newChannelDataAllList)
+    newInformationAll = getCovMatrix.getInformations(newCovMatrixAllList)
+
+    newCovMatrixList = getCovMatrix.getCovMatrixList(newChannelDataList)
+    newInformation = getCovMatrix.getInformations(newCovMatrixList)
+
+    for i in range(len(channelDataList)):
+        rate2 = newInformation[0][i] / newInformationAll[0][i]
+        rates[i, 1] = rate2
+
+    rateList.append(rates)
+    return newChannelDataList, newCovMatrixList, U2s, rateList
+
+
+def pca_S(covMatrixList, newDimension=1):
+    rates = np.array(np.zeros((len(covMatrixList), 2)), dtype=complex)
+    rateList = []
+    # 降维
+    for i in range(len(covMatrixList)):
+        U, Sigma, VT = np.linalg.svd(covMatrixList[i], full_matrices=0)
+        sumTotal = np.sum(Sigma)
+        sumNew = np.sum(Sigma[0:newDimension])
+        rate2 = sumNew / sumTotal
+        rates[i, 0] = newDimension
+        rates[i, 1] = rate2
+    rateList.append(rates)
+    return rateList
 
 
 if __name__ == '__main__':
