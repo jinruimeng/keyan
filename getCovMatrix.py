@@ -31,6 +31,7 @@ def matrixListToMatrix(covMatrixList):
         cur = 0
         for j in range(n):
             for k in range(j, n):
+                # 考虑太小的量是否忽略不计
                 # if curMatrix[j, k] >= 0.1:
                 #     allCovMatrix[i, cur] = curMatrix[j, k]
                 # else:
@@ -47,8 +48,8 @@ def matrixListToMatrix_U(UList):
         for i in range(len(UList)):
             curU = UList[i]
             cur = 0
-            for j in range(m):
-                for k in range(n):
+            for k in range(n):
+                for j in range(m):
                     allU[i, cur] = curU[j, k]
                     cur += 1
     except:
@@ -74,7 +75,7 @@ def matrixToMatrixList(allCovMatrix):
         curCol = 0
         for j in range(n):
             curMatrix[curRow, curCol] = allCovMatrix[i, j]
-            curMatrix[curCol, curRow] = allCovMatrix[i, j]
+            curMatrix[curCol, curRow] = allCovMatrix[i, j].conjugate()
             curCol += 1
             if curCol >= p:
                 curRow += 1
@@ -91,23 +92,31 @@ def matrixToMatrixList_U(allU):
     for i in range(m):
         U = np.array(np.zeros((p, p)), dtype=complex)
         for j in range(p):
-            U[j, :] = allU[i, j * p:(j + 1) * p]
+            U[:, j] = allU[i, j * p:(j + 1) * p]
         UList.append(U)
     return UList
 
 
 def getInformations(covMatrixList):
     informations = []
+    SigmaList = []
     information = np.array(np.zeros((len(covMatrixList), 1)), dtype=complex)
+    UList = []
     for i in range(len(covMatrixList)):
         try:
             U, Sigma, VT = np.linalg.svd(covMatrixList[i], full_matrices=0)
+            UList.append(U)
             sum = np.sum(Sigma)
+            # 将SigmaList中的值换成权重
+            for j in range(len(Sigma)):
+                Sigma[j] = Sigma[j]/sum
         except:
             sum = covMatrixList[i]
+            Sigma = np.ones((1, 1))
         information[i, 0] = sum
+        SigmaList.append(Sigma)
     informations.append(information)
-    return informations
+    return informations, SigmaList, UList
 
 
 if __name__ == '__main__':

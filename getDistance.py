@@ -17,7 +17,7 @@ def oushiDistance(x, y):
     return sum
     # return abs(np.corrcoef(x, y))  # 计算相关系数的绝对值
 
-
+# 马氏距离计算
 def mashiDistance(x, y, IcovMatrix):
     dif = x - y
     distance = abs(np.dot(dif, np.dot(IcovMatrix, np.transpose(dif))))

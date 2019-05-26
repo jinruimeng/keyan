@@ -55,7 +55,7 @@ def KMeansOushi(dataSet, k):
         # 第 4 步：更新质心
         for j in range(k):
             pointsInCluster = dataSet[np.nonzero(clusterAssment[:, 0].A == j)[0]]  # 获取簇类所有的点
-            if np.shape(pointsInCluster)[0] > 0:
+            if np.shape(pointsInCluster)[0] > 1:
                 centroids[j, :] = np.mean(pointsInCluster, axis=0)  # 对矩阵的行求均值
         for i in range(m):
             clusterAssment[i, 1] = getDistance.oushiDistance(centroids[int(clusterAssment[i, 0].real), :],
@@ -64,8 +64,6 @@ def KMeansOushi(dataSet, k):
             clusterChange = True
 
     print("Congratulations,cluster complete!")
-    # print("centroids:\n", centroids)
-    # print("clusterAssment:\n", clusterAssment)
     return centroids, clusterAssment
 
 
@@ -100,7 +98,7 @@ def KMeansOushi_U(dataSet, k, weights, newDimension):
                 # 计算该样本到质心的加权距离
                 distance = 0
                 for a in range(p):
-                    distance + getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension],
+                    distance += getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension],
                                                          dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
                 if distance < minDist:
                     minDist = distance
@@ -207,17 +205,6 @@ def KMeansMashi(dataSet, k):
     covMatrix = np.cov(allData, rowvar=False)
     IcovMatrix = np.linalg.inv(covMatrix)
 
-    # outMatrixList = []
-    # outMatrixList.append(allData)
-    # outMatrixList.append(covMatrix)
-    # outMatrixList.append(IcovMatrix)
-    # path = "/Users/jinruimeng/Downloads/keyan/"
-    # # path = "E:\\workspace\\keyan\\"
-    # nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    # outSomeMatrixListPath = path + "getCentroids_outSomeMatrixList_mashi" + str(
-    #     nowTime) + ".xlsx"
-    # readAndWriteDataSet.write(outMatrixList, outSomeMatrixListPath)
-
     for i in range(m):
         clusterAssment[i, 1] = getDistance.mashiDistance(centroids[int(clusterAssment[i, 0]), :], dataSet[i, :],
                                                          IcovMatrix)
@@ -234,17 +221,6 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
     # 第一列存样本属于哪一簇
     # 第二列存样本的到簇的中心点的误差
     clusterAssment = np.array(np.ones((m, 2)), dtype=complex)
-
-    # outMatrixList = []
-    # outMatrixList.append(allData)
-    # outMatrixList.append(covMatrix)
-    # outMatrixList.append(IcovMatrix)
-    # path = "/Users/jinruimeng/Downloads/keyan/"
-    # # path = "E:\\workspace\\keyan\\"
-    # nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    # outSomeMatrixListPath = path + "cluster_outSomeMatrixList_" + type + str(
-    #     nowTime) + ".xlsx"
-    # readAndWriteDataSet.write(outMatrixList, outSomeMatrixListPath)
 
     # 遍历所有的样本（行数）
     for i in range(m):
