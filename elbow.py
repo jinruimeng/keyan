@@ -29,8 +29,8 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, type2, type=u'oushi'):
     # 维度固定iRateOrK == iRate
     if type2 == 0:
         for i in range(low, high + 1, step):
-            # SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, i, iRateOrK, type)).get()
-            SSE = elbowCore(channelDataAll, a, i, iRateOrK, type)
+            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, i, iRateOrK, type)).get()
+            # SSE = elbowCore(channelDataAll, a, i, iRateOrK, type)
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
@@ -39,8 +39,8 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, type2, type=u'oushi'):
     # 聚类中心数量固定iRateOrK == k
     else:
         for i in range(low, high + 1, step):
-            # SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, iRateOrK, i, type)).get()
-            SSE = elbowCore(channelDataAll, a, iRateOrK, i, type)
+            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, iRateOrK, i, type)).get()
+            # SSE = elbowCore(channelDataAll, a, iRateOrK, i, type)
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
@@ -50,9 +50,12 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, type2, type=u'oushi'):
     ps.join()
     X = range(low, high + 1, step)
     plt.ylabel(u'信息量保留')
-    plt.plot(X, SSE_S, 'b-o')
-    plt.plot(X, SSE_C, 'r-v')
-    plt.plot(X, SSE_U, 'k-s')
+    plt.plot(X, SSE_S, 'k-s', label=u'标准PCA')
+    plt.plot(X, SSE_C, 'r-v', label=u'聚类协方差矩阵')
+    plt.plot(X, SSE_U, 'b-o', label=u'聚类变换矩阵')
+
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=0,
+               ncol=3, mode="expand", borderaxespad=0.)
     plt.show()
     print(u'主进程结束！')
 
@@ -119,7 +122,7 @@ if __name__ == '__main__':
 
     # 确定维度，改变聚类中心数量
     iRate = 4
-    elbow(channelDataAll, 1, 15, 2, a, iRate, 0, type)
+    elbow(channelDataAll, 1, 2, 15, a, iRate, 0, type)
 
     # 确定聚类中心数量，改变维度
     # k = 2
