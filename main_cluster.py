@@ -7,11 +7,12 @@ import numpy as np
 import multiprocessing
 import os
 
-sumbu = [0]
+manager = multiprocessing.Manager()
+schedule = manager.Array('i', [1, 0])
 
 
 def cluster(type, path, suffix, channelData, g, iRate):
-    print(u'共' + str(sumbu[0]) + u'部分！')
+    print(u'共' + str(schedule[0]) + u'部分！')
     print(u'第' + str(g) + u'部分开始！')
     centroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_"
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
@@ -59,8 +60,9 @@ def cluster(type, path, suffix, channelData, g, iRate):
     readAndWriteDataSet.write(rates, ratesPath, suffix)
 
     # 显示进度
-    print(u'共' + str(sumbu[0]) + u'部分！')
-    print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (g / sumbu[0] * 100))
+    schedule[1] += 1
+    print(u'共' + str(schedule[0]) + u'部分！')
+    print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
 
 
 if __name__ == '__main__':
@@ -74,7 +76,7 @@ if __name__ == '__main__':
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
     a = 0  # 拆分成2^a份
-    sumbu[0] = 1 << a
+    schedule[0] = 1 << a
     sub = n >> a
     iRate = 3  # 降维后维度
 

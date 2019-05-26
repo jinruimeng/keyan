@@ -6,15 +6,16 @@ import pca
 import time
 import numpy as np
 
-sumbu = [0]
+manager = multiprocessing.Manager()
+schedule = manager.Array('i', [1, 0])
 
 
 def getCentroids(type, path, suffix, channelData, g, k, iRate):
-    print(u'共' + str(sumbu[0]) + u'部分！')
+    print(u'共' + str(schedule[0]) + u'部分！')
     print(u'第' + str(g) + u'部分开始！')
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     # outOldCovMatrixListPath = path + "getCentroids_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
-    outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime)
+    # outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime)
     outClusterAssmentPath = path + "getCentroids_outClusterAssment_" + type + "_" + str(g) + "_" + str(nowTime)
     outNewChannelDataPath = path + "getCentroids_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
     outNewCovMatrixListPath = path + "getCentroids_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
@@ -38,7 +39,8 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
     clusterAssmentList.append(clusterAssment)
     centroidList = getCovMatrix.matrixToMatrixList(centroids)
     readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
-    readAndWriteDataSet.write(centroidList, outCentroidListPath, suffix)
+    # 聚类中心太大了，先不输出
+    # readAndWriteDataSet.write(centroidList, outCentroidListPath, suffix)
 
     # 分析PCA效果
     informations = getCovMatrix.getInformations(covMatrixList)[0]
@@ -52,8 +54,9 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
     readAndWriteDataSet.write(rates, ratesPath, suffix)
 
     # 显示进度
-    print(u'共' + str(sumbu[0]) + u'部分！')
-    print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (g / sumbu[0] * 100))
+    schedule[1] += 1
+    print(u'共' + str(schedule[0]) + u'部分！')
+    print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
 
 
 if __name__ == '__main__':
@@ -69,8 +72,8 @@ if __name__ == '__main__':
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
-    a = 0  # 拆分成2^a份
-    sumbu[0] = 1 << a
+    a = 2  # 拆分成2^a份
+    schedule[0] = 1 << a
     sub = n >> a
     iRate = 3  # 降维后维度
     k = 3  # 聚类中心数量
