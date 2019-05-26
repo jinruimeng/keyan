@@ -105,12 +105,13 @@ def getInformations(covMatrixList):
     for i in range(len(covMatrixList)):
         try:
             U, Sigma, VT = np.linalg.svd(covMatrixList[i], full_matrices=0)
-            UList.append(U)
+            UList.append(np.transpose(VT))
             sum = np.sum(Sigma)
             # 将SigmaList中的值换成权重
             for j in range(len(Sigma)):
                 Sigma[j] = Sigma[j]/sum
         except:
+            UList.append((np.ones((1, 1))))
             sum = covMatrixList[i]
             Sigma = np.ones((1, 1))
         information[i, 0] = sum

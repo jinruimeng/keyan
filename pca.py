@@ -5,7 +5,7 @@ import getCovMatrix
 
 
 def pca(channelData, informations, centroidList, clusterAssment, rate=1):
-    VT2s = []
+    U2s = []
     rates = np.array(np.zeros((len(channelData), 2)), dtype=complex)
     rateList = []
     newChannelDataList = []
@@ -25,12 +25,12 @@ def pca(channelData, informations, centroidList, clusterAssment, rate=1):
                     break
         else:
             index = rate - 1
-        VT2 = VT[0:index + 1, :]
-        VT2s.append(VT2)
+        U2 = np.transpose(VT[0:index + 1, :])
+        U2s.append(U2)
 
     # 降维
     for i in range(len(channelData)):
-        newChannelData = np.dot(channelData[i], np.transpose(VT2s[(int)(clusterAssment[i, 0].real)]))
+        newChannelData = np.dot(channelData[i], U2s[(int)(clusterAssment[i, 0].real)])
         newChannelDataList.append(newChannelData)
         index = np.shape(newChannelData)[1]
         rates[i, 0] = index
@@ -43,7 +43,7 @@ def pca(channelData, informations, centroidList, clusterAssment, rate=1):
         rates[i, 1] = rate2
 
     rateList.append(rates)
-    return newChannelDataList, newCovMatrixList, VT2s, rateList
+    return newChannelDataList, newCovMatrixList, U2s, rateList
 
 
 def pca_U(channelDataList, informations, centroidList, clusterAssment, newDimension=1):
@@ -56,7 +56,7 @@ def pca_U(channelDataList, informations, centroidList, clusterAssment, newDimens
 
     # 计算变换矩阵
     for i in range(len(centroidList)):
-        U2 = np.conjugate(centroidList[i][:, 0:newDimension])
+        U2 = centroidList[i][:, 0:newDimension]
         U2s.append(U2)
 
     # 降维

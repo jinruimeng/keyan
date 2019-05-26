@@ -6,9 +6,12 @@ import pca
 import time
 import numpy as np
 
+sumbu = [0]
+
 
 def getCentroids(type, path, suffix, channelData, g, k, iRate):
-    print(u'第' + str(g) + u'轮开始！')
+    print(u'共' + str(sumbu[0]) + u'部分！')
+    print(u'第' + str(g) + u'部分开始！')
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     # outOldCovMatrixListPath = path + "getCentroids_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
     outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime)
@@ -16,7 +19,7 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
     outNewChannelDataPath = path + "getCentroids_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
     outNewCovMatrixListPath = path + "getCentroids_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
     ratesPath = path + "getCentroids_rates_" + type + "_" + str(g) + "_" + str(nowTime)
-    VTsPath = path + "getCentroids_VTs_" + type + "_" + str(g) + "_" + str(nowTime)
+    UTsPath = path + "getCentroids_UTs_" + type + "_" + str(g) + "_" + str(nowTime)
 
     # 得到相关系数矩阵并输出,然后放到一个矩阵中
     covMatrixList = getCovMatrix.getCovMatrixList(channelData)
@@ -39,21 +42,24 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
 
     # 分析PCA效果
     informations = getCovMatrix.getInformations(covMatrixList)[0]
-    newChannelData, newCovMatrixList, VTs, rates = pca.pca(channelData, informations, centroidList, clusterAssment,
+    newChannelData, newCovMatrixList, UTs, rates = pca.pca(channelData, informations, centroidList, clusterAssment,
                                                            iRate)
 
     # 输出PCA后结果
     readAndWriteDataSet.write(newChannelData, outNewChannelDataPath, suffix)
     readAndWriteDataSet.write(newCovMatrixList, outNewCovMatrixListPath, suffix)
-    readAndWriteDataSet.write(VTs, VTsPath, suffix)
+    readAndWriteDataSet.write(UTs, UTsPath, suffix)
     readAndWriteDataSet.write(rates, ratesPath, suffix)
-    print(u'第' + str(g) + u'轮结束！')
+
+    # 显示进度
+    print(u'共' + str(sumbu[0]) + u'部分！')
+    print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (g / sumbu[0] * 100))
 
 
 if __name__ == '__main__':
     type = u'oushi'
-    # path = u'/Users/jinruimeng/Downloads/keyan/'
-    path = u'E:\\workspace\\keyan\\'
+    path = u'/Users/jinruimeng/Downloads/keyan/'
+    # path = u'E:\\workspace\\keyan\\'
     suffix = u'.xlsx'
 
     # 读取数据
@@ -63,16 +69,17 @@ if __name__ == '__main__':
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
-    a = 1  # 拆分成2^a份
+    a = 0  # 拆分成2^a份
+    sumbu[0] = 1 << a
     sub = n >> a
-    iRate = 4
-    k = 7  # 聚类中心数量
+    iRate = 3  # 降维后维度
+    k = 3  # 聚类中心数量
 
-    for g in range(1 << a):
+    for g in range(1, (1 << a) + 1):
         channelData = []
         for i in range(p):
             channelDataPage = channelDataAll[i]
-            channelData.append(channelDataPage[:, g * sub:(g + 1) * sub])
+            channelData.append(channelDataPage[:, (g - 1) * sub:g * sub])
         ps.apply_async(getCentroids, args=(type, path, suffix, channelData, g, k, iRate))
         # getCentroids(type, path, suffix, channelData, g, k, iRate)
 

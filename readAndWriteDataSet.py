@@ -56,8 +56,8 @@ def write(outData, path, suffix=".xlsx"):
     if ".xlsx" == suffix:
         m = len(outData)
         buff = 0
-        bn = 1
-        workbook = xlsxwriter.Workbook(path + "_0" + suffix)  # 创建一个Excel文件
+        bn = 2
+        workbook = xlsxwriter.Workbook(path + "_1" + suffix)  # 创建一个Excel文件
         for i in range(m):
             if buff >= 1800000:
                 workbook.close()

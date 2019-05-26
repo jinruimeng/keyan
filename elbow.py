@@ -5,7 +5,7 @@ from pylab import *
 mpl.rcParams['font.sans-serif'] = ['SimHei']
 import matplotlib.pyplot as plt
 
-# # 指定默认字体
+# 指定默认字体
 # plt.rcParams['font.sans-serif'] = ['SimHei']
 # plt.rcParams['font.family'] = 'sans-serif'
 # # 用来正常显示负号
@@ -18,9 +18,26 @@ import getCovMatrix
 import kmeans
 import pca
 
+manager = multiprocessing.Manager()
+schedule = manager.Array('i', [1, 0])
+
 
 def elbow(channelDataAll, low, high, step, a, iRateOrK, type2, type=u'oushi'):
-    '利用SSE选择k'
+    # 检查参数合理性
+    if low <= 0:
+        print(u'下限太低：下限小于等于0！')
+        return
+    if type2 == 0 and high > len(channelDataAll):
+        print(u'上限太高：聚类中心个数大于数据的个数！')
+        return
+    if type2 == 1 and high >= (shape(channelDataAll[0])[1] / (1 << a)):
+        print(u'上限太高：降维后维度数大于原数据维度！')
+        return
+
+    # 计算要聚类的总次数
+    schedule[0] = (int)(((high - low + 1) / step) * (1 << a))
+
+    # 利用SSE选择k
     SSE_S = []  # 存放每次结果
     SSE_C = []  # 存放每次结果
     SSE_U = []  # 存放每次结果
@@ -107,6 +124,10 @@ def elbowCore(channelDataAll, a, k, iRate, type=u'oushi'):
     rate_U = np.mean(rates_U)
     rate_S = np.mean(rates_S)
 
+    # 显示进度
+    schedule[1] += 1
+    print(u'需聚类' + str(schedule[0]) + u'轮')
+    print(u'已完成' + str(schedule[1]) + u'轮，' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
     return rate_S.real, rate_C.real, rate_U.real
 
 
@@ -114,16 +135,16 @@ if __name__ == '__main__':
     type = u'oushi'
     # path = u'/Users/jinruimeng/Downloads/keyan/'
     path = u'E:\\workspace\\keyan\\'
-    a = 1
+    a = 0
 
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     # 确定维度，改变聚类中心数量
-    iRate = 4
-    elbow(channelDataAll, 1, 2, 15, a, iRate, 0, type)
+    iRate = 3
+    elbow(channelDataAll, 1, 15, 2, a, iRate, 0, type)
 
     # 确定聚类中心数量，改变维度
-    # k = 2
-    # elbow(channelDataAll, 10, 12, 1, a, k, 1, type)
+    # k = 5
+    # elbow(channelDataAll, 3, 5, 1, a, k, 1, type)
