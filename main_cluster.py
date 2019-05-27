@@ -7,14 +7,16 @@ import numpy as np
 import multiprocessing
 import os
 
-manager = multiprocessing.Manager()
-schedule = manager.Array('i', [1, 0])
 
+def cluster(schedule, type, path, suffix, channelData, g, iRate):
+    if iRate > np.shape(channelData)[1]:
+        print(u'降维后维度不能大于样本原有的维度！')
+        return
+    if iRate <= 0:
+        print(u'降维后维度不能小于1！')
+        return
 
-def cluster(type, path, suffix, channelData, g, iRate):
-    if __name__ == '__main__':
-        print(u'共' + str(schedule[0]) + u'部分！')
-        print(u'第' + str(g) + u'部分开始！')
+    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分开始！')
     centroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_"
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     # outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
@@ -61,13 +63,15 @@ def cluster(type, path, suffix, channelData, g, iRate):
     readAndWriteDataSet.write(rates, ratesPath, suffix)
 
     # 显示进度
-    if __name__ == '__main__':
-        schedule[1] += 1
-        print(u'共' + str(schedule[0]) + u'部分！')
-        print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
+    schedule[1] += 1
+    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分完成，' + u'已完成' + str(
+        schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
+                  schedule[1] / schedule[0] * 100) + u'！')
 
 
 if __name__ == '__main__':
+    manager = multiprocessing.Manager()
+    schedule = manager.Array('i', [1, 0])
     type = u'oushi'
     path = u'/Users/jinruimeng/Downloads/keyan/'
     # path = u'E:\\workspace\\keyan\\'
@@ -80,15 +84,15 @@ if __name__ == '__main__':
     a = 0  # 拆分成2^a份
     schedule[0] = 1 << a
     sub = n >> a
-    iRate = 3  # 降维后维度
+    iRate = 4  # 降维后维度
 
     for g in range(1, (1 << a) + 1):
         channelData = []
         for i in range(p):
             channelDataPage = channelDataAll[i]
             channelData.append(channelDataPage[:, (g - 1) * sub:g * sub])
-        ps.apply_async(cluster, args=(type, path, suffix, channelData, g, iRate))
-        # cluster(type, path, suffix, channelData, g, iRate)
+        ps.apply_async(cluster, args=(schedule, type, path, suffix, channelData, g, iRate))
+        # cluster(schedule, type, path, suffix, channelData, g, iRate)
     ps.close()
     ps.join()
     print("主进程结束！")

@@ -6,14 +6,20 @@ import pca
 import time
 import numpy as np
 
-manager = multiprocessing.Manager()
-schedule = manager.Array('i', [1, 0])
 
+def getCentroids(schedule, type, path, suffix, channelData, g, k, iRate):
+    # 校验数据正确性
+    if k > np.shape(channelData)[0]:
+        print(u'聚类中心数量不能大于样本数量！')
+        return
+    if iRate > np.shape(channelData)[1]:
+        print(u'降维后维度不能大于样本原有的维度！')
+        return
+    if k <= 0 or iRate <= 0:
+        print(u'聚类中心数量和降维后维度不能小于1！')
+        return
 
-def getCentroids(type, path, suffix, channelData, g, k, iRate):
-    if __name__ == '__main__':
-        print(u'共' + str(schedule[0]) + u'部分！')
-        print(u'第' + str(g) + u'部分开始！')
+    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分开始！')
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     # outOldCovMatrixListPath = path + "getCentroids_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
     # outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime)
@@ -55,16 +61,19 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
     readAndWriteDataSet.write(rates, ratesPath, suffix)
 
     # 显示进度
-    if __name__ == '__main__':
-        schedule[1] += 1
-        print(u'共' + str(schedule[0]) + u'部分！')
-        print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
+    schedule[1] += 1
+    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分完成，' + u'已完成' + str(
+        schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
+                  schedule[1] / schedule[0] * 100) + u'！')
 
 
 if __name__ == '__main__':
+    manager = multiprocessing.Manager()
+    schedule = manager.Array('i', [1, 0])
+
     type = u'oushi'
-    # path = u'/Users/jinruimeng/Downloads/keyan/'
-    path = u'E:\\workspace\\keyan\\'
+    path = u'/Users/jinruimeng/Downloads/keyan/'
+    # path = u'E:\\workspace\\keyan\\'
     suffix = u'.xlsx'
 
     # 读取数据
@@ -74,19 +83,19 @@ if __name__ == '__main__':
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     ps = multiprocessing.Pool(4)
-    a = 2  # 拆分成2^a份
+    a = 0  # 拆分成2^a份
     schedule[0] = 1 << a
     sub = n >> a
-    iRate = 3  # 降维后维度
-    k = 3  # 聚类中心数量
+    iRate = 4  # 降维后维度
+    k = 7  # 聚类中心数量
 
     for g in range(1, (1 << a) + 1):
         channelData = []
         for i in range(p):
             channelDataPage = channelDataAll[i]
             channelData.append(channelDataPage[:, (g - 1) * sub:g * sub])
-        ps.apply_async(getCentroids, args=(type, path, suffix, channelData, g, k, iRate))
-        # getCentroids(type, path, suffix, channelData, g, k, iRate)
+        ps.apply_async(getCentroids, args=(schedule, type, path, suffix, channelData, g, k, iRate))
+        # getCentroids(schedule, type, path, suffix, channelData, g, k, iRate)
 
     ps.close()
     ps.join()
