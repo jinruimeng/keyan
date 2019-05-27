@@ -11,8 +11,9 @@ schedule = manager.Array('i', [1, 0])
 
 
 def getCentroids(type, path, suffix, channelData, g, k, iRate):
-    print(u'共' + str(schedule[0]) + u'部分！')
-    print(u'第' + str(g) + u'部分开始！')
+    if __name__ == '__main__':
+        print(u'共' + str(schedule[0]) + u'部分！')
+        print(u'第' + str(g) + u'部分开始！')
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
     # outOldCovMatrixListPath = path + "getCentroids_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
     # outCentroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_" + str(nowTime)
@@ -54,15 +55,16 @@ def getCentroids(type, path, suffix, channelData, g, k, iRate):
     readAndWriteDataSet.write(rates, ratesPath, suffix)
 
     # 显示进度
-    schedule[1] += 1
-    print(u'共' + str(schedule[0]) + u'部分！')
-    print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
+    if __name__ == '__main__':
+        schedule[1] += 1
+        print(u'共' + str(schedule[0]) + u'部分！')
+        print(u'第' + str(g) + u'部分结束！' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
 
 
 if __name__ == '__main__':
     type = u'oushi'
-    path = u'/Users/jinruimeng/Downloads/keyan/'
-    # path = u'E:\\workspace\\keyan\\'
+    # path = u'/Users/jinruimeng/Downloads/keyan/'
+    path = u'E:\\workspace\\keyan\\'
     suffix = u'.xlsx'
 
     # 读取数据

@@ -35,7 +35,8 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, type2, type=u'oushi'):
         return
 
     # 计算要聚类的总次数
-    schedule[0] = (int)(((high - low + 1) / step) * (1 << a))
+    if __name__ == "__main__":
+        schedule[0] = ((int)((high - low) / step + 1)) * (1 << a)
 
     # 利用SSE选择k
     SSE_S = []  # 存放每次结果
@@ -120,22 +121,24 @@ def elbowCore(channelDataAll, a, k, iRate, type=u'oushi'):
         tmpRates = pca.pca_S(SigmaList, iRate)[0][:, 1]
         rates_S.append(np.mean(tmpRates))
 
+        # 显示进度
+        if __name__ == "__main__":
+            schedule[1] += 1
+            print(u'需聚类' + str(schedule[0]) + u'轮')
+            print(u'已完成' + str(schedule[1]) + u'轮，' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
+
     rate_C = np.mean(rates_C)
     rate_U = np.mean(rates_U)
     rate_S = np.mean(rates_S)
 
-    # 显示进度
-    schedule[1] += 1
-    print(u'需聚类' + str(schedule[0]) + u'轮')
-    print(u'已完成' + str(schedule[1]) + u'轮，' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100))
     return rate_S.real, rate_C.real, rate_U.real
 
 
 if __name__ == '__main__':
     type = u'oushi'
-    # path = u'/Users/jinruimeng/Downloads/keyan/'
-    path = u'E:\\workspace\\keyan\\'
-    a = 0
+    path = u'/Users/jinruimeng/Downloads/keyan/'
+    # path = u'E:\\workspace\\keyan\\'
+    a = 2
 
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
@@ -143,7 +146,7 @@ if __name__ == '__main__':
 
     # 确定维度，改变聚类中心数量
     iRate = 3
-    elbow(channelDataAll, 1, 15, 2, a, iRate, 0, type)
+    elbow(channelDataAll, 1, 2, 2, a, iRate, 0, type)
 
     # 确定聚类中心数量，改变维度
     # k = 5
