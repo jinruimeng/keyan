@@ -197,7 +197,7 @@ if __name__ == '__main__':
     type = u'oushi'
     # path = u'/Users/jinruimeng/Downloads/keyan/'
     path = u'E:\\workspace\\keyan\\'
-    a = 0
+    a = 2
 
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
@@ -212,4 +212,4 @@ if __name__ == '__main__':
     # elbow(channelDataAll, 3, 5, 1, a, k, schedule, 1, type)
 
     # 用标准PCA选择k
-    elbow2(channelDataAll, 1, 10, 1, a, schedule)
+    elbow2(channelDataAll, 5, 60, 5, a, schedule)
