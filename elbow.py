@@ -51,7 +51,7 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type2, type=u'
         plt.xlabel(u'聚类中心数量K')
 
     # 聚类中心数量固定iRateOrK == k
-    else:
+    if type2 == 1:
         for i in range(low, high + 1, step):
             SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, iRateOrK, i, schedule, type)).get()
             # SSE = elbowCore(channelDataAll, a, iRateOrK, i, schedule, type)
@@ -138,6 +138,58 @@ def elbowCore(channelDataAll, a, k, iRate, schedule, type=u'oushi'):
     return rate_S.real, rate_C.real, rate_U.real
 
 
+def elbow2(channelDataAll, low, high, step, a, schedule):
+    # 检查参数合理性
+    if low <= 0:
+        print(u'下限太低：下限小于等于0！')
+        return
+
+    if high >= (shape(channelDataAll[0])[1] / (1 << a)):
+        print(u'上限太高：降维后维度数大于原数据维度！')
+        return
+
+    # 计算PCA的总次数
+    time1 = ((int)((high - low) / step + 1))
+    time2 = 1 << a
+    schedule[0] = time2
+
+    # 利用SSE选择k
+    SSE_S = []  # 存放所有结果
+    rates_S = np.array(np.zeros((time2, time1)))  # 存放单次结果
+
+    n = np.shape(channelDataAll[0])[1]  # 列数
+    p = len(channelDataAll)  # 页数
+    sub = n >> a
+    for g in range(time2):
+        channelData = []
+        for h in range(p):
+            channelDataPage = channelDataAll[h]
+            channelData.append(channelDataPage[:, g * sub:(g + 1) * sub])
+
+        covMatrixList = getCovMatrix.getCovMatrixList(channelData)
+
+        # 计算原信道信息量、协方差矩阵特征值、变换矩阵
+        informations, SigmaList, UList = getCovMatrix.getInformations(covMatrixList)
+        for h in range(time1):
+            tmpRates = pca.pca_S(SigmaList, h * step + low)[0][:, 1]
+            rates_S[g, h] = np.mean(tmpRates).real
+
+        # 显示进度
+        schedule[1] += 1
+        print(u'共' + str(schedule[0]) + u'轮，' + u'已完成' + str(schedule[1]) + u'轮，' + u'完成度：' + '%.2f%%' % (
+                    schedule[1] / schedule[0] * 100) + u'！')
+
+    for h in range(time1):
+        SSE_S.append(np.mean(rates_S[:, h]))
+    plt.xlabel(u'保留维度数k')
+
+    X = range(low, high + 1, step)
+    plt.ylabel(u'特征值保留')
+    plt.plot(X, SSE_S, 'k-s')
+    plt.show()
+    print(u'主进程结束！')
+
+
 if __name__ == '__main__':
     manager = multiprocessing.Manager()
     schedule = manager.Array('i', [1, 0])
@@ -152,9 +204,12 @@ if __name__ == '__main__':
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     # 确定维度，改变聚类中心数量
-    iRate = 4
-    elbow(channelDataAll, 1, 15, 1, a, iRate, schedule, 0, type)
+    # iRate = 4
+    # elbow(channelDataAll, 1, 15, 1, a, iRate, schedule, 0, type)
 
     # 确定聚类中心数量，改变维度
     # k = 5
     # elbow(channelDataAll, 3, 5, 1, a, k, schedule, 1, type)
+
+    # 用标准PCA选择k
+    elbow2(channelDataAll, 1, 10, 1, a, schedule)
