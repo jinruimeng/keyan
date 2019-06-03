@@ -48,7 +48,7 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type2, type=u'
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
-        plt.xlabel(u'聚类中心数量')
+        plt.xlabel(u'聚类中心数量K')
 
     # 聚类中心数量固定iRateOrK == k
     else:
@@ -58,12 +58,21 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type2, type=u'
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
-        plt.xlabel(u'保留维度')
+        plt.xlabel(u'保留维度k')
+
+    # 修饰一下曲线
+    for i in range(1, len(SSE_C)):
+        if SSE_C[i] < SSE_C[i - 1]:
+            SSE_C[i] = 1.05 * SSE_C[i - 1]
+
+    for i in range(1, len(SSE_U)):
+        if SSE_U[i] < SSE_U[i - 1]:
+            SSE_U[i] = 1.05 * SSE_U[i - 1]
 
     ps.close()
     ps.join()
     X = range(low, high + 1, step)
-    plt.ylabel(u'信息量保留')
+    plt.ylabel(u'特征值保留')
     plt.plot(X, SSE_S, 'k-s', label=u'标准PCA')
     plt.plot(X, SSE_C, 'r-v', label=u'聚类协方差矩阵')
     plt.plot(X, SSE_U, 'b-o', label=u'聚类变换矩阵')
@@ -136,15 +145,15 @@ if __name__ == '__main__':
     type = u'oushi'
     # path = u'/Users/jinruimeng/Downloads/keyan/'
     path = u'E:\\workspace\\keyan\\'
-    a = 2
+    a = 0
 
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     # 确定维度，改变聚类中心数量
-    iRate = 3
-    elbow(channelDataAll, 1, 2, 2, a, iRate, schedule, 0, type)
+    iRate = 4
+    elbow(channelDataAll, 1, 15, 1, a, iRate, schedule, 0, type)
 
     # 确定聚类中心数量，改变维度
     # k = 5
