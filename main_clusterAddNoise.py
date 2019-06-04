@@ -86,7 +86,8 @@ def clusterCore(channelData1, covMatrixList1, channelData2, centroids, centroidU
     newChannelDataAll1 = getCovMatrix.matrixListToMatrix_U(newChannelData1)
     newChannelDataAll2 = getCovMatrix.matrixListToMatrix_U(newChannelData2)
     for i in range(len(channelData1)):
-        newCCorr.append(np.corrcoef(newChannelDataAll1[i, :], newChannelDataAll2[i, :])[0, 1])
+        corrrrr = np.corrcoef(newChannelDataAll1[i, :], newChannelDataAll2[i, :])
+        newCCorr.append(corrrrr[0, 1])
 
     return np.mean(newCCorr)
 

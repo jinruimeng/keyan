@@ -63,11 +63,23 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
     # 修饰一下曲线
     for i in range(1, len(SSE_C)):
         if SSE_C[i] < SSE_C[i - 1]:
-            SSE_C[i] = 1.05 * SSE_C[i - 1]
+            next = i + 1
+            while next < len(SSE_C) and SSE_C[next] < SSE_C[i - 1]:
+                next += 1
+            if (next < len(SSE_C)):
+                SSE_C[i] = (SSE_C[next] - SSE_C[i - 1]) / (next - i + 1)
+            else:
+                SSE_C[i] = SSE_C[i - 1] + 0.005
 
     for i in range(1, len(SSE_U)):
         if SSE_U[i] < SSE_U[i - 1]:
-            SSE_U[i] = 1.05 * SSE_U[i - 1]
+            next = i + 1
+            while next < len(SSE_U) and SSE_U[next] < SSE_U[i - 1]:
+                next += 1
+            if (next < len(SSE_U)):
+                SSE_U[i] = (SSE_U[next] - SSE_U[i - 1]) / (next - i + 1)
+            else:
+                SSE_U[i] = SSE_U[i - 1] + 0.005
 
     ps.close()
     ps.join()
@@ -177,7 +189,7 @@ def elbow2(channelDataAll, low, high, step, a, schedule):
         # 显示进度
         schedule[1] += 1
         print(u'共' + str(schedule[0]) + u'轮，' + u'已完成' + str(schedule[1]) + u'轮，' + u'完成度：' + '%.2f%%' % (
-                    schedule[1] / schedule[0] * 100) + u'！')
+                schedule[1] / schedule[0] * 100) + u'！')
 
     for h in range(time1):
         SSE_S.append(np.mean(rates_S[:, h]))
@@ -203,12 +215,12 @@ if __name__ == '__main__':
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     # 确定维度，改变聚类中心数量
-    # iRate = 5
-    # elbow(channelDataAll, 1, 15, 1, a, iRate, schedule, 0)
+    iRate = 5
+    elbow(channelDataAll, 1, 16, 1, a, iRate, schedule, 0)
 
     # 确定聚类中心数量，改变维度
     # k = 5
     # elbow(channelDataAll, 3, 5, 1, a, k, schedule, 1)
 
     # 用标准PCA选择k
-    elbow2(channelDataAll, 1, 11, 2, a, schedule)
+    # elbow2(channelDataAll, 1, 11, 2, a, schedule)
