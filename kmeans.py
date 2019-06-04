@@ -99,7 +99,7 @@ def KMeansOushi_U(dataSet, k, weights, newDimension):
                 distance = 0
                 for a in range(p):
                     distance += getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension],
-                                                         dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
+                                                          dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
                 if distance < minDist:
                     minDist = distance
                     minIndex = j
@@ -239,6 +239,39 @@ def getClusterAssment(dataSet, centroids, type="oushi"):
                 distance = getDistance.mashiDistance(centroids[j, :], dataSet[i, :], IcovMatrix)
             else:
                 distance = getDistance.oushiDistance(centroids[j, :], dataSet[i, :])
+            if distance < minDist:
+                minDist = distance
+                minIndex = j
+
+        # 第 3 步：更新每一行样本所属的簇
+        clusterAssment[i, :] = minIndex, minDist
+    return clusterAssment
+
+
+# 已知聚类中心，求样本属于哪个类
+def getClusterAssment_U(dataSet, weights, centroids, newDimension):
+    m, n = np.shape(dataSet)  # 行的数目
+    p = (int)(n ** 0.5)
+    if newDimension > p:
+        newDimension = p
+    k = np.shape(centroids)[0]  # 中心点的数量
+    # 第一列存样本属于哪一簇
+    # 第二列存样本的到簇的中心点的误差
+    clusterAssment = np.array(np.ones((m, 2)), dtype=complex)
+
+    # 遍历所有的样本（行数）
+    for i in range(m):
+        minDist = 100000000.0
+        minIndex = -1
+
+        # 遍历所有的中心点
+        # 第2步 找出最近的中心点
+        for j in range(k):
+            # 计算该样本到质心的加权距离
+            distance = 0
+            for a in range(p):
+                distance += getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension],
+                                                      dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
             if distance < minDist:
                 minDist = distance
                 minIndex = j

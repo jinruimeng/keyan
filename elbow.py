@@ -19,15 +19,15 @@ import kmeans
 import pca
 
 
-def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type2, type=u'oushi'):
+def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
     # 检查参数合理性
     if low <= 0:
         print(u'下限太低：下限小于等于0！')
         return
-    if type2 == 0 and high > len(channelDataAll):
+    if type == 0 and high > len(channelDataAll):
         print(u'上限太高：聚类中心个数大于数据的个数！')
         return
-    if type2 == 1 and high >= (shape(channelDataAll[0])[1] / (1 << a)):
+    if type == 1 and high >= (shape(channelDataAll[0])[1] / (1 << a)):
         print(u'上限太高：降维后维度数大于原数据维度！')
         return
 
@@ -41,20 +41,20 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type2, type=u'
     ps = multiprocessing.Pool(4)
 
     # 维度固定iRateOrK == iRate
-    if type2 == 0:
+    if type == 0:
         for i in range(low, high + 1, step):
-            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, i, iRateOrK, schedule, type)).get()
-            # SSE = elbowCore(channelDataAll, a, i, iRateOrK, schedule, type)
+            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, i, iRateOrK, schedule)).get()
+            # SSE = elbowCore(channelDataAll, a, i, iRateOrK, schedule)
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
         plt.xlabel(u'聚类中心数量K')
 
     # 聚类中心数量固定iRateOrK == k
-    if type2 == 1:
+    if type == 1:
         for i in range(low, high + 1, step):
-            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, iRateOrK, i, schedule, type)).get()
-            # SSE = elbowCore(channelDataAll, a, iRateOrK, i, schedule, type)
+            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, iRateOrK, i, schedule)).get()
+            # SSE = elbowCore(channelDataAll, a, iRateOrK, i, schedule)
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
@@ -84,7 +84,7 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type2, type=u'
 
 
 # k:聚类中心数量 iRate:维度
-def elbowCore(channelDataAll, a, k, iRate, schedule, type=u'oushi'):
+def elbowCore(channelDataAll, a, k, iRate, schedule):
     n = np.shape(channelDataAll[0])[1]  # 列数
     p = len(channelDataAll)  # 页数
     sub = n >> a
@@ -194,22 +194,21 @@ if __name__ == '__main__':
     manager = multiprocessing.Manager()
     schedule = manager.Array('i', [1, 0])
 
-    type = u'oushi'
     # path = u'/Users/jinruimeng/Downloads/keyan/'
     path = u'E:\\workspace\\keyan\\'
-    a = 2
+    a = 0
 
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
 
     # 确定维度，改变聚类中心数量
-    # iRate = 4
-    # elbow(channelDataAll, 1, 15, 1, a, iRate, schedule, 0, type)
+    # iRate = 5
+    # elbow(channelDataAll, 1, 15, 1, a, iRate, schedule, 0)
 
     # 确定聚类中心数量，改变维度
     # k = 5
-    # elbow(channelDataAll, 3, 5, 1, a, k, schedule, 1, type)
+    # elbow(channelDataAll, 3, 5, 1, a, k, schedule, 1)
 
     # 用标准PCA选择k
-    elbow2(channelDataAll, 5, 60, 5, a, schedule)
+    elbow2(channelDataAll, 1, 11, 2, a, schedule)

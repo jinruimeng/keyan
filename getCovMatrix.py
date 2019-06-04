@@ -41,6 +41,7 @@ def matrixListToMatrix(covMatrixList):
     return allCovMatrix
 
 
+# 单纯的把一个矩阵拉成一行,列先走
 def matrixListToMatrix_U(UList):
     try:
         m, n = np.shape(UList[0])
@@ -109,7 +110,7 @@ def getInformations(covMatrixList):
             sum = np.sum(Sigma)
             # 将SigmaList中的值换成权重
             for j in range(len(Sigma)):
-                Sigma[j] = Sigma[j]/sum
+                Sigma[j] = Sigma[j] / sum
         except:
             UList.append((np.ones((1, 1))))
             sum = covMatrixList[i]

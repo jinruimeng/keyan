@@ -8,7 +8,7 @@ import multiprocessing
 import os
 
 
-def cluster(schedule, type, path, suffix, channelData, g, iRate):
+def cluster(schedule, path, suffix, channelData, g, iRate):
     if iRate > np.shape(channelData)[1]:
         print(u'降维后维度不能大于样本原有的维度！')
         return
@@ -17,16 +17,22 @@ def cluster(schedule, type, path, suffix, channelData, g, iRate):
         return
 
     print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分开始！')
-    centroidListPath = path + "getCentroids_outCentroidList_" + type + "_" + str(g) + "_"
+
+    pathSuffix = "C" + "_" + str(g) + "_"
+    centroidListPath = path + "getCentroids_outCentroidList_" + pathSuffix
+
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    # outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
-    outClusterAssmentPath = path + "cluster_outClusterAssment_" + type + "_" + str(g) + "_" + str(nowTime)
-    outNewChannelDataPath = path + "cluster_outNewChannelData_" + type + "_" + str(g) + "_" + str(nowTime)
-    outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + type + "_" + str(g) + "_" + str(nowTime)
-    ratesPath = path + "cluster_rates_" + type + "_" + str(g) + "_" + str(nowTime)
-    UTsPath = path + "cluster_UTs_" + type + "_" + str(g) + "_" + str(nowTime)
+    pathSuffix = pathSuffix + str(nowTime)
+
+    outOldCovMatrixListPath = path + "cluster_outOldCovMatrixList_" + pathSuffix
+    outClusterAssmentPath = path + "cluster_outClusterAssment_" + pathSuffix
+    outNewChannelDataPath = path + "cluster_outNewChannelData_" + pathSuffix
+    outNewCovMatrixsPath = path + "cluster_outNewCovMatrixList_" + pathSuffix
+    ratesPath = path + "cluster_rates_" + pathSuffix
+    UTsPath = path + "cluster_UTs_" + pathSuffix
 
     # 读入聚类中心信息
+    # 合并多个文件
     centroidList = []
     for root, dirs, files in os.walk(path, topdown=True):
         for file in files:
@@ -41,21 +47,21 @@ def cluster(schedule, type, path, suffix, channelData, g, iRate):
     # 计算信道相关系数矩阵并输出，然后放到一个矩阵中
     covMatrixList = getCovMatrix.getCovMatrixList(channelData)
     allCovMatrix = getCovMatrix.matrixListToMatrix(covMatrixList)
-    # 协方差矩阵太大了，先不输出
-    # readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath, suffix)
 
     # 确定每个数据分别属于哪个簇
-    clusterAssment = kmeans.getClusterAssment(allCovMatrix, centroids, type)
-
-    # 输出聚类结果
+    clusterAssment = kmeans.getClusterAssment(allCovMatrix, centroids)
     clusterAssmentList = []
     clusterAssmentList.append(clusterAssment)
-    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
 
     # 分析PCA效果
     newChannelData, newCovMatrixList, UTs, rates = pca.pca(channelData, covMatrixList, centroidList, clusterAssment,
                                                            iRate)
 
+    # 输出结果
+    # 输出聚类结果
+    readAndWriteDataSet.write(clusterAssmentList, outClusterAssmentPath, suffix)
+    # 协方差矩阵太大了，先不输出
+    # readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath, suffix)
     # 输出PCA结果
     readAndWriteDataSet.write(newChannelData, outNewChannelDataPath, suffix)
     readAndWriteDataSet.write(newCovMatrixList, outNewCovMatrixsPath, suffix)
@@ -72,7 +78,6 @@ def cluster(schedule, type, path, suffix, channelData, g, iRate):
 if __name__ == '__main__':
     manager = multiprocessing.Manager()
     schedule = manager.Array('i', [1, 0])
-    type = u'oushi'
     path = u'/Users/jinruimeng/Downloads/keyan/'
     # path = u'E:\\workspace\\keyan\\'
     suffix = u'.xlsx'
@@ -91,8 +96,8 @@ if __name__ == '__main__':
         for i in range(p):
             channelDataPage = channelDataAll[i]
             channelData.append(channelDataPage[:, (g - 1) * sub:g * sub])
-        ps.apply_async(cluster, args=(schedule, type, path, suffix, channelData, g, iRate))
-        # cluster(schedule, type, path, suffix, channelData, g, iRate)
+        ps.apply_async(cluster, args=(schedule, path, suffix, channelData, g, iRate))
+        # cluster(schedule, path, suffix, channelData, g, iRate)
     ps.close()
     ps.join()
     print("主进程结束！")
