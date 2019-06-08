@@ -1,6 +1,10 @@
 from pylab import *
 
-mpl.rcParams['font.sans-serif'] = ['SimHei']
+# 指定默认字体
+plt.rcParams['font.sans-serif'] = ['SimHei']
+plt.rcParams['font.family'] = 'sans-serif'
+# 用来正常显示负号
+plt.rcParams['axes.unicode_minus'] = False
 import matplotlib.pyplot as plt
 
 import readAndWriteDataSet
@@ -12,13 +16,15 @@ import os
 import addNoise
 
 
-def cluster(schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentroidUList, allCentroidsU,
+def cluster(a, schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentroidUList, allCentroidsU,
             allCentroidUList2):
     allOldCorr = []
     allNewCCorr = []
     allNewUCorr = []
     for g in range(1, (1 << a) + 1):
-        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分开始！')
+        schedule[1] += 1
+        tmpSchedule = schedule[1]
+        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分开始！')
 
         channelData1 = []
         channelData2 = []
@@ -44,8 +50,7 @@ def cluster(schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentro
         allNewUCorr.append(newUCorrMean)
 
         # 显示进度
-        schedule[1] += 1
-        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分完成，' + u'已完成' + str(
+        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(
             schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
                       schedule[1] / schedule[0] * 100) + u'！')
 
@@ -82,14 +87,24 @@ def clusterCore(channelData1, covMatrixList1, channelData2, centroids, centroidU
             newChannelData1.append(np.dot(channelData1[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
             newChannelData2.append(np.dot(channelData2[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
 
-    newCCorr = []
+    newCorr = []
     newChannelDataAll1 = getCovMatrix.matrixListToMatrix_U(newChannelData1)
     newChannelDataAll2 = getCovMatrix.matrixListToMatrix_U(newChannelData2)
     for i in range(len(channelData1)):
-        corrrrr = np.corrcoef(newChannelDataAll1[i, :], newChannelDataAll2[i, :])
-        newCCorr.append(corrrrr[0, 1])
+        cowCor = np.corrcoef(newChannelDataAll1[i, :], newChannelDataAll2[i, :])
+        newCorr.append(cowCor[0, 1])
 
-    return np.mean(newCCorr)
+    # 输出处理后的信道和相关系数
+    # path = u'/Users/jinruimeng/Downloads/keyan/'
+    # nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
+    # pathSuffix = type + "_" + nowTime
+    #
+    # outNewChannel1ListPath = path + "clusterAddNoise_outNewChannel1List_" + pathSuffix
+    # outNewChannel2ListPath = path + "clusterAddNoise_outNewChannel2List_" + pathSuffix
+    # readAndWriteDataSet.write(newChannelData1, outNewChannel1ListPath, ".xlsx")
+    # readAndWriteDataSet.write(newChannelData2, outNewChannel2ListPath, ".xlsx")
+
+    return np.mean(newCorr)
 
 
 if __name__ == '__main__':
@@ -104,7 +119,7 @@ if __name__ == '__main__':
 
     # 信噪比的上下限
     low = 5
-    high = 40
+    high = 60
     step = 5
 
     # 显示进度
@@ -205,8 +220,20 @@ if __name__ == '__main__':
             channelDataAll1.append(channelDataAll[i] + addNoise.wgn(channelDataAll[i], SNR))
             channelDataAll2.append(channelDataAll[i] + addNoise.wgn(channelDataAll[i], SNR))
 
-        # eanAllOldCorr, meanAllNewCCorr, meanAllNewUCorr = ps.apply_async(cluster, args=(schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentroidUList, allCentroidsU, allCentroidUList2)).get()
-        meanAllOldCorr, meanAllNewCCorr, meanAllNewUCorr = cluster(schedule, channelDataAll1, channelDataAll2,
+        path = u'/Users/jinruimeng/Downloads/keyan/'
+        nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
+        pathSuffix = str(SNR) + u'_' + nowTime
+
+        # 输出添加噪声后的信道数据
+        # outChannelAll1ListPath = path + "clusterAddNoise_outChannelAll1List_" + pathSuffix
+        # outChannelAll2ListPath = path + "clusterAddNoise_outChannelAll2List_" + pathSuffix
+        # readAndWriteDataSet.write(channelDataAll1, outChannelAll1ListPath, ".xlsx")
+        # readAndWriteDataSet.write(channelDataAll2, outChannelAll2ListPath, ".xlsx")
+
+        # meanAllOldCorr, meanAllNewCCorr, meanAllNewUCorr = ps.apply_async(cluster, args=(
+        #     a, schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentroidUList, allCentroidsU,
+        #     allCentroidUList2)).get()
+        meanAllOldCorr, meanAllNewCCorr, meanAllNewUCorr = cluster(a, schedule, channelDataAll1, channelDataAll2,
                                                                    allCentroidsC, allCentroidUList, allCentroidsU,
                                                                    allCentroidUList2)
         totalOldCorr.append(meanAllOldCorr)

@@ -16,7 +16,9 @@ def cluster(schedule, path, suffix, channelData, g, iRate):
         print(u'降维后维度不能小于1！')
         return
 
-    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分开始！')
+    schedule[1] += 1
+    tmpSchedule = schedule[1]
+    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分开始！')
 
     pathSuffix = "C" + "_" + str(g) + "_"
     centroidListPath = path + "getCentroids_outCentroidList_" + pathSuffix
@@ -69,8 +71,7 @@ def cluster(schedule, path, suffix, channelData, g, iRate):
     readAndWriteDataSet.write(rates, ratesPath, suffix)
 
     # 显示进度
-    schedule[1] += 1
-    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(g) + u'部分完成，' + u'已完成' + str(
+    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(
         schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
                   schedule[1] / schedule[0] * 100) + u'！')
 

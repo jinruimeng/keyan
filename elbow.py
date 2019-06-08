@@ -2,14 +2,12 @@
 # 支持中文显示
 from pylab import *
 
-mpl.rcParams['font.sans-serif'] = ['SimHei']
-import matplotlib.pyplot as plt
-
 # 指定默认字体
-# plt.rcParams['font.sans-serif'] = ['SimHei']
-# plt.rcParams['font.family'] = 'sans-serif'
-# # 用来正常显示负号
-# plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['font.sans-serif'] = ['SimHei']
+plt.rcParams['font.family'] = 'sans-serif'
+# 用来正常显示负号
+plt.rcParams['axes.unicode_minus'] = False
+import matplotlib.pyplot as plt
 
 import readAndWriteDataSet
 import multiprocessing
@@ -43,8 +41,8 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
     # 维度固定iRateOrK == iRate
     if type == 0:
         for i in range(low, high + 1, step):
-            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, i, iRateOrK, schedule)).get()
-            # SSE = elbowCore(channelDataAll, a, i, iRateOrK, schedule)
+            # SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, i, iRateOrK, schedule)).get()
+            SSE = elbowCore(channelDataAll, a, i, iRateOrK, schedule)
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
@@ -53,8 +51,8 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
     # 聚类中心数量固定iRateOrK == k
     if type == 1:
         for i in range(low, high + 1, step):
-            SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, iRateOrK, i, schedule)).get()
-            # SSE = elbowCore(channelDataAll, a, iRateOrK, i, schedule)
+            # SSE = ps.apply_async(elbowCore, args=(channelDataAll, a, iRateOrK, i, schedule)).get()
+            SSE = elbowCore(channelDataAll, a, iRateOrK, i, schedule)
             SSE_S.append(SSE[0])
             SSE_C.append(SSE[1])
             SSE_U.append(SSE[2])
@@ -67,9 +65,9 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
             while next < len(SSE_C) and SSE_C[next] < SSE_C[i - 1]:
                 next += 1
             if (next < len(SSE_C)):
-                SSE_C[i] = (SSE_C[next] - SSE_C[i - 1]) / (next - i + 1)
+                SSE_C[i] = ((SSE_C[next] - SSE_C[i - 1]) / (next - i + 1)) + SSE_C[i - 1]
             else:
-                SSE_C[i] = SSE_C[i - 1] + 0.005
+                SSE_C[i] = 2 * SSE_C[i - 1] - SSE_C[i]
 
     for i in range(1, len(SSE_U)):
         if SSE_U[i] < SSE_U[i - 1]:
@@ -77,9 +75,9 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
             while next < len(SSE_U) and SSE_U[next] < SSE_U[i - 1]:
                 next += 1
             if (next < len(SSE_U)):
-                SSE_U[i] = (SSE_U[next] - SSE_U[i - 1]) / (next - i + 1)
+                SSE_U[i] = ((SSE_U[next] - SSE_U[i - 1]) / (next - i + 1)) + SSE_U[i - 1]
             else:
-                SSE_U[i] = SSE_U[i - 1] + 0.005
+                SSE_U[i] = 2 * SSE_U[i - 1] - SSE_U[i]
 
     ps.close()
     ps.join()
@@ -105,6 +103,11 @@ def elbowCore(channelDataAll, a, k, iRate, schedule):
     rates_S = []
 
     for g in range(1 << a):
+        # 显示进度
+        schedule[1] += 1
+        tmpSchedule = schedule[1]
+        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分开始！')
+
         channelData = []
         for h in range(p):
             channelDataPage = channelDataAll[h]
@@ -139,9 +142,9 @@ def elbowCore(channelDataAll, a, k, iRate, schedule):
         rates_S.append(np.mean(tmpRates))
 
         # 显示进度
-        schedule[1] += 1
-        print(u'共' + str(schedule[0]) + u'轮，' + u'已完成' + str(schedule[1]) + u'轮，' + u'完成度：' + '%.2f%%' % (
-                schedule[1] / schedule[0] * 100) + u'！')
+        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(
+            schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
+                      schedule[1] / schedule[0] * 100) + u'！')
 
     rate_C = np.mean(rates_C)
     rate_U = np.mean(rates_U)
@@ -206,8 +209,8 @@ if __name__ == '__main__':
     manager = multiprocessing.Manager()
     schedule = manager.Array('i', [1, 0])
 
-    # path = u'/Users/jinruimeng/Downloads/keyan/'
-    path = u'E:\\workspace\\keyan\\'
+    path = u'/Users/jinruimeng/Downloads/keyan/'
+    # path = u'E:\\workspace\\keyan\\'
     a = 0
 
     # 读取数据

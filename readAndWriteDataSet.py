@@ -54,26 +54,67 @@ def excelToMatrix2(path, k=0):
 # 将数据存储成excel
 def write(outData, path, suffix=".xlsx"):
     if ".xlsx" == suffix:
-        m = len(outData)
-        buff = 0
-        bn = 2
         workbook = xlsxwriter.Workbook(path + "_1" + suffix)  # 创建一个Excel文件
-        for i in range(m):
-            if buff >= 1800000:
-                workbook.close()
-                workbook = xlsxwriter.Workbook(path + "_" + str(bn) + suffix)
-                buff = 0
-                bn += 1
-            [h, l] = outData[i].shape
+        try:
+            h, l = np.shape(outData)
             worksheet = workbook.add_worksheet()  # 创建sheet
             for j in range(h):
                 for k in range(l):
-                    tmp = str(outData[i][j, k])
+                    tmp = str(outData[j, k])
                     worksheet.write_string(j, k, tmp)
-                    buff += 1
+        except:
+            m = len(outData)
+            try:
+                [h, l] = outData[0].shape
+                buff = 0
+                bn = 2
+                for i in range(m):
+                    if buff >= 1800000:
+                        workbook.close()
+                        workbook = xlsxwriter.Workbook(path + "_" + str(bn) + suffix)
+                        buff = 0
+                        bn += 1
+                    [h, l] = outData[i].shape
+                    worksheet = workbook.add_worksheet()  # 创建sheet
+                    for j in range(h):
+                        for k in range(l):
+                            tmp = str(outData[i][j, k])
+                            worksheet.write_string(j, k, tmp)
+                            buff += 1
+            except:
+                workbook = xlsxwriter.Workbook(path + "_1" + suffix)  # 创建一个Excel文件
+                worksheet = workbook.add_worksheet()  # 创建sheet
+                for i in range(m):
+                    tmp = str(outData[i])
+                    worksheet.write_string(i, 1, tmp)
         workbook.close()
     if ".npy" == suffix:
         np.save(path, outData)
+
+
+# 将数据存储成excel
+# List中存的是一维数据
+# def write2(outData, path, suffix=".xlsx"):
+#     if ".xlsx" == suffix:
+#         m = len(outData)
+#         workbook = xlsxwriter.Workbook(path + "_1" + suffix)  # 创建一个Excel文件
+#         worksheet = workbook.add_worksheet()  # 创建sheet
+#         for i in range(m):
+#             tmp = str(outData[i])
+#             worksheet.write_string(i, 1, tmp)
+#         workbook.close()
+#     if ".npy" == suffix:
+#         np.save(path, outData)
+
+def listToArray(listObj):
+    m = len(listObj)
+    n = len(listObj[0])
+    out = np.array(np.zeros((m, n)))
+    for i in range(m):
+        for j in range(n):
+            out[i, j] = listObj[i][j]
+
+    return out
 
 
 if __name__ == '__main__':
