@@ -21,7 +21,7 @@ def wgn(x, snr):
     snr = 10 ** (snr / 10.0)
 
     try:
-        # 如果输入是单个信号，进行以下步骤
+        # 如果输入是矩阵，进行以下步骤
         m, n = np.shape(x)
         # 计算输入信号平均功率
         xpower = (np.linalg.norm(x) ** 2) / (m * n)
@@ -33,7 +33,7 @@ def wgn(x, snr):
             for j in range(n):
                 noise[i, j] = complex(np.random.randn(), np.random.randn()) * np.sqrt(npower) / np.sqrt(2)
     except:
-        # 如果输入是多个信号，进行以下步骤
+        # 如果输入是列表，进行以下步骤
         m = np.shape(x)[0]
         xpower = (np.linalg.norm(x) ** 2) / m
         npower = xpower / snr
