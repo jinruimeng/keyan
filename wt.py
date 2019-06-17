@@ -18,5 +18,6 @@ if __name__ == '__main__':
     while len(cA) > 5:
         cA = pywt.dwt(cA, 'haar')[0]
 
+    # test
     print(len(cA))
     print(cA)
