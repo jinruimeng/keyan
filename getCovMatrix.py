@@ -121,6 +121,24 @@ def getInformations(covMatrixList):
     return informations, SigmaList, UList
 
 
+def getAbs(matrix):
+    try:
+        m, n = np.shape(matrix)
+        result = np.array(np.zeros((m, n)), dtype='float32')
+        for i in range(m):
+            for j in range(n):
+                result[i, j] = np.abs(matrix[i, j])
+    except:
+        m = np.shape(matrix)[0]
+        result = []
+        for i in range(m):
+            tmpAbs = np.abs(matrix[i])
+            tmpAbs.dtype = 'float32'
+            result.append(tmpAbs)
+
+    return result
+
+
 if __name__ == '__main__':
     datafile = u'E:\\workspace\\keyan\\test2.xlsx'
     dataSource = readAndWriteDataSet.excelToMatrix(datafile)
