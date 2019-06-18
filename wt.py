@@ -1,6 +1,23 @@
 import readAndWriteDataSet
 import getCovMatrix
 import pywt
+import numpy as np
+
+
+def wt(channelData, newDimension=1):
+    tmp = []
+    m, n = np.shape(channelData)
+    for i in range(m):
+        tmp.append(pywt.dwt(channelData[i, :], 'haar')[0])
+    result = tmp
+    tmp = []
+    while len(result[0]) > newDimension:
+        for i in range(m):
+            tmp.append(pywt.dwt(result[i], 'haar')[0])
+        result = tmp
+        tmp = []
+    return np.array(result)
+
 
 if __name__ == '__main__':
     type = u'oushi'
@@ -12,12 +29,6 @@ if __name__ == '__main__':
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
     channelData = getCovMatrix.getAbs(channelDataAll[0])
 
-    coeffs = pywt.dwt(channelData[0, :], 'haar')
-    cA, cD = coeffs
+    result = wt(channelData, 5)
 
-    while len(cA) > 5:
-        cA = pywt.dwt(cA, 'haar')[0]
-
-    # test
-    print(len(cA))
-    print(cA)
+    print(np.shape(result))

@@ -135,7 +135,6 @@ def getAbs(matrix):
             tmpAbs = np.abs(matrix[i])
             tmpAbs.dtype = 'float32'
             result.append(tmpAbs)
-
     return result
 
 
