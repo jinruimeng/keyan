@@ -1,49 +1,63 @@
 import numpy as np
 
-# 量化
-# input: channelData1-Alice信道数据 channelData2-Bob信道数据 bitNum-量化比特数
-# output: key1-Alice量化后的密钥 key2-Bob量化后的密钥
-def quantificate(channelData1, channelData2, bitNum):
-    bitNum = bitNum.real
-    try:
-        # 判断输入是单个信道还是多个信道
-        # 如果是单个信道，进行以下步骤
-        m, n = np.shape(channelData1)
-        for i in range(m):
-            # 本方案对幅度进行量化
-            for j in range(n):
-                channelData1[i, j] = abs(channelData1[i, j])
-                channelData2[i, j] = abs(channelData2[i, j])
-    except:
-        # 如果是多个信道，进行以下步骤
-        m = np.shape(channelData1)[0]
-        for i in range(m):
-            channelData1[i] = abs(channelData1[i])
-            channelData2[i] = abs(channelData2[i])
 
-    # 寻找最大值和最小值
-    maxNum = max(channelData1.max(), channelData2.max())
-    minNum = min(channelData1.min(), channelData2.min())
-    # 确定量化间隔
-    deta = (int)((maxNum - minNum).real / (1 << bitNum)) + 1
-    # 确定密钥形式，后续可以考虑引入格雷码
-    keyFormat = "{0:0" + str(bitNum) + "b}"
+# 量化
+# input: channelData1-Alice信道数据 channelData2-Bob信道数据
+# output: key1-Alice量化后的密钥 key2-Bob量化后的密钥
+def quantificate(channelData1, channelData2):
+    m, n = np.shape(channelData1)
+    for i in range(m):
+        # 本方案对幅度进行量化
+        for j in range(n):
+            channelData1[i, j] = abs(channelData1[i, j])
+            channelData2[i, j] = abs(channelData2[i, j])
+
     key1 = u''
     key2 = u''
+    covMatrix1 = np.cov(channelData1, rowvar=False)
+    covMatrix2 = np.cov(channelData2, rowvar=False)
 
-    try:
-        m, n = np.shape(channelData1)
-        for i in range(m):
-            for j in range(n):
-                key1 = key1 + keyFormat.format((int)(((channelData1[i, j] - minNum) / deta).real))
-                key2 = key2 + keyFormat.format((int)(((channelData2[i, j] - minNum) / deta).real))
-    except:
-        m = np.shape(channelData1)[0]
-        for i in range(m):
-            key1 = key1 + keyFormat.format((int)(((channelData1[i] - minNum) / deta).real))
-            key2 = key2 + keyFormat.format((int)(((channelData2[i] - minNum) / deta).real))
+    for i in range(n):
+        tmpKey = quantificateWithSNR(channelData1[:, i], channelData2[:, i],
+                                     max(covMatrix1[i, i], covMatrix2[i, i]) - 1)
+        key1 = key1 + tmpKey[0]
+        key2 = key2 + tmpKey[1]
 
     return key1, key2
+
+
+def quantificateWithSNR(data1, data2, SNR):
+    SNR = 10 * np.log10(SNR)
+    if SNR >= 42.3:
+        bitNum = 8
+    else:
+        if SNR >= 36.3:
+            bitNum = 6
+        else:
+            if SNR >= 30.4:
+                bitNum = 4
+            else:
+                if SNR >= 24.5:
+                    bitNum = 2
+                else:
+                    bitNum = 0
+
+    # 寻找最大值和最小值
+    maxNum = max(data1.max(), data2.max())
+    minNum = min(data1.min(), data2.min())
+    # 确定量化间隔
+    deta = (maxNum - minNum) / (1 << bitNum)
+    # 确定密钥形式，后续可以考虑引入格雷码
+    keyFormat = "{0:0" + str(bitNum) + "b}"
+    tmpKey1 = u''
+    tmpKey2 = u''
+    m = np.shape(data1)[0]
+    for i in range(m):
+        tmpKey1 = tmpKey1 + keyFormat.format((int)((int)((data1[i] - minNum) / deta)-0.001))
+        tmpKey2 = tmpKey2 + keyFormat.format((int)((int)((data2[i] - minNum) / deta)-0.001))
+
+    return tmpKey1, tmpKey2
+
 
 # 计算密钥不一致率
 # input: key1-Alice量化后的密钥 key2-Bob量化后的密钥

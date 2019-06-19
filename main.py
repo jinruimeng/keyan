@@ -8,19 +8,27 @@ plt.rcParams['axes.unicode_minus'] = False
 import matplotlib.pyplot as plt
 
 import readAndWriteDataSet
+import quantification
 import kmeans
 import getCovMatrix
 import numpy as np
 import multiprocessing
 import os
 import addNoise
+import pca
+import wt
 
 
 def cluster(a, schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentroidUList, allCentroidsU,
             allCentroidUList2):
-    allOldCorr = []
-    allNewCCorr = []
-    allNewUCorr = []
+    newPca1 = []
+    newPca2 = []
+    newC1 = []
+    newC2 = []
+    newU1 = []
+    newU2 = []
+    newWt1 = []
+    newWt2 = []
     for g in range(1, (1 << a) + 1):
         schedule[1] += 1
         tmpSchedule = schedule[1]
@@ -28,33 +36,43 @@ def cluster(a, schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCen
 
         channelData1 = []
         channelData2 = []
-        for i in range(p):
+        for i in range(len(channelDataAll1)):
             channelData1.append(channelDataAll1[i][:, (g - 1) * sub:g * sub])
             channelData2.append(channelDataAll2[i][:, (g - 1) * sub:g * sub])
-        oldCorr = []
-        channelDatas1 = getCovMatrix.matrixListToMatrix_U(channelData1)
-        channelDatas2 = getCovMatrix.matrixListToMatrix_U(channelData2)
-        # 计算信道协方差矩阵呢
+
+        # 计算信道协方差矩阵
         covMatrixList1 = getCovMatrix.getCovMatrixList(channelData1)
 
-        for i in range(len(channelData1)):
-            oldCorr.append(np.corrcoef(channelDatas1[i, :], channelDatas2[i, :]))
-        allOldCorr.append(np.mean(oldCorr))
+        # 无交互PCA
+        tmpNewPca1, tmpNewPca2 = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsC[g - 1],
+                                             allCentroidUList[g - 1], "general")
+        newPca1.append(tmpNewPca1)
+        newPca2.append(tmpNewPca2)
 
-        newCCorrMean = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsC[g - 1],
-                                   allCentroidUList[g - 1], "C")
-        allNewCCorr.append(newCCorrMean)
+        # 聚类协方差矩阵
+        tmpNewC1, tmpNewC2 = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsC[g - 1],
+                                         allCentroidUList[g - 1], "C")
+        newC1.append(tmpNewC1)
+        newC2.append(tmpNewC2)
 
-        newUCorrMean = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsU[g - 1],
-                                   allCentroidUList2[g - 1], "U")
-        allNewUCorr.append(newUCorrMean)
+        # 聚类变换矩阵
+        tmpNewU1, tmpNewU2 = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsU[g - 1],
+                                         allCentroidUList2[g - 1], "U")
+        newU1.append(tmpNewU1)
+        newU2.append(tmpNewU2)
+
+        # DCT变换
+        tmpNewWt1, tmpNewWt2 = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsU[g - 1],
+                                           allCentroidUList2[g - 1], "wt")
+        newWt1.append(tmpNewWt1)
+        newWt2.append(tmpNewWt2)
 
         # 显示进度
         print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(
             schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
                       schedule[1] / schedule[0] * 100) + u'！')
 
-    return abs(np.mean(allOldCorr)), abs(np.mean(allNewCCorr)), abs(np.mean(allNewUCorr))
+    return newPca1, newPca2, newC1, newC2, newU1, newU2, newWt1, newWt2
 
 
 def clusterCore(channelData1, covMatrixList1, channelData2, centroids, centroidUList, type):
@@ -87,24 +105,21 @@ def clusterCore(channelData1, covMatrixList1, channelData2, centroids, centroidU
             newChannelData1.append(np.dot(channelData1[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
             newChannelData2.append(np.dot(channelData2[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
 
-    newCorr = []
-    newChannelDataAll1 = getCovMatrix.matrixListToMatrix_U(newChannelData1)
-    newChannelDataAll2 = getCovMatrix.matrixListToMatrix_U(newChannelData2)
-    for i in range(len(channelData1)):
-        cowCor = np.corrcoef(newChannelDataAll1[i, :], newChannelDataAll2[i, :])
-        newCorr.append(cowCor[0, 1])
+    if type == "general":
+        newChannelData1 = pca.pca_general(channelData1, newDimension)
+        newChannelData2 = pca.pca_general(channelData2, newDimension)
 
-    # 输出处理后的信道和相关系数
-    # path = u'/Users/jinruimeng/Downloads/keyan/'
-    # nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    # pathSuffix = type + "_" + nowTime
-    #
-    # outNewChannel1ListPath = path + "clusterAddNoise_outNewChannel1List_" + pathSuffix
-    # outNewChannel2ListPath = path + "clusterAddNoise_outNewChannel2List_" + pathSuffix
-    # readAndWriteDataSet.write(newChannelData1, outNewChannel1ListPath, ".xlsx")
-    # readAndWriteDataSet.write(newChannelData2, outNewChannel2ListPath, ".xlsx")
+    if type == "none":
+        newChannelData1 = channelData1
+        newChannelData2 = channelData2
 
-    return np.mean(newCorr)
+    if type == "wt":
+        # 变换域
+        for i in range(len(channelData1)):
+            newChannelData1.append(wt.wt(channelData1[i], newDimension))
+            newChannelData2.append(wt.wt(channelData2[i], newDimension))
+
+    return newChannelData1, newChannelData2
 
 
 if __name__ == '__main__':
@@ -165,8 +180,8 @@ if __name__ == '__main__':
             U, Sigma, VT = np.linalg.svd(centroidList_g[i])
             sum = np.sum(Sigma)
             curSum = 0
-            index = 0
             if iRate <= 1:
+                index = 0
                 for j in range(len(Sigma)):
                     curSum += Sigma[j]
                     if iRate - (curSum / sum) > 0:
@@ -201,13 +216,12 @@ if __name__ == '__main__':
         # 计算聚类中心的变换矩阵
         for i in range(len(centroidList_g)):
             U2 = centroidList_g[i][:, 0:iRate]
+            for j in range(np.shape(U2)[1]):
+                # 噪声功率归一
+                U2[:, j] = U2[:, j] / np.linalg.norm((U2[:, j]))
             UList_g.append(U2)
         allCentroidsU.append(getCovMatrix.matrixListToMatrix_U(centroidList_g))
         allCentroidUList2.append(UList_g)
-
-    totalOldCorr = []
-    totalNewCCorr = []
-    totalNewUCorr = []
 
     for h in range(time1):
         SNR = low + h * step
@@ -215,13 +229,13 @@ if __name__ == '__main__':
         # 添加噪声
         channelDataAll1 = []
         channelDataAll2 = []
-        for i in range(len(channelDataAll)):
+        for i in range(p):
             channelDataAll1.append(channelDataAll[i] + addNoise.wgn(channelDataAll[i], SNR))
             channelDataAll2.append(channelDataAll[i] + addNoise.wgn(channelDataAll[i], SNR))
 
-        path = u'/Users/jinruimeng/Downloads/keyan/'
-        nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-        pathSuffix = str(SNR) + u'_' + nowTime
+        # path = u'/Users/jinruimeng/Downloads/keyan/'
+        # nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
+        # pathSuffix = str(SNR) + u'_' + nowTime
 
         # 输出添加噪声后的信道数据
         # outChannelAll1ListPath = path + "clusterAddNoise_outChannelAll1List_" + pathSuffix
@@ -232,23 +246,34 @@ if __name__ == '__main__':
         # meanAllOldCorr, meanAllNewCCorr, meanAllNewUCorr = ps.apply_async(cluster, args=(
         #     a, schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentroidUList, allCentroidsU,
         #     allCentroidUList2)).get()
-        meanAllOldCorr, meanAllNewCCorr, meanAllNewUCorr = cluster(a, schedule, channelDataAll1, channelDataAll2,
-                                                                   allCentroidsC, allCentroidUList, allCentroidsU,
-                                                                   allCentroidUList2)
-        totalOldCorr.append(meanAllOldCorr)
-        totalNewCCorr.append(meanAllNewCCorr)
-        totalNewUCorr.append(meanAllNewUCorr)
+        newPca1, newPca2, newC1, newC2, newU1, newU2, newWt1, newWt2 = cluster(a, schedule, channelDataAll1,
+                                                                               channelDataAll2,
+                                                                               allCentroidsC, allCentroidUList,
+                                                                               allCentroidsU,
+                                                                               allCentroidUList2)
 
-    ps.close()
-    ps.join()
+        key_newPca1 = []
+        key_newPca2 = []
+        key_newC1 = []
+        key_newC2 = []
+        key_newU1 = []
+        key_newU2 = []
+        key_newWt1 = []
+        key_newWt2 = []
+        for i in range(p):
+            tmpKey = quantification.quantificate(newPca1, newPca2)
+            key_newPca1.append(tmpKey[0])
+            key_newPca2.append(tmpKey[1])
+            tmpKey = quantification.quantificate(newC1, newC2)
+            key_newC1.append(tmpKey[0])
+            key_newC2.append(tmpKey[1])
+            tmpKey = quantification.quantificate(newU1, newU2)
+            key_newU1.append(tmpKey[0])
+            key_newU2.append(tmpKey[1])
+            tmpKey = quantification.quantificate(newWt1, newWt2)
+            print(tmpKey[0])
+            print(tmpKey[1])
+            key_newWt1.append(tmpKey[0])
+            key_newWt2.append(tmpKey[1])
 
-    plt.xlabel(u'信噪比（dB）')
-    X = range(low, high + 1, step)
-    plt.ylabel(u'相关系数')
-    plt.plot(X, totalOldCorr, 'k-s', label=u'预处理前')
-    plt.plot(X, totalNewCCorr, 'r-v', label=u'聚类协方差矩阵')
-    plt.plot(X, totalNewUCorr, 'b-o', label=u'聚类变换矩阵')
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=0,
-               ncol=3, mode="expand", borderaxespad=0.)
-    plt.show()
     print("主进程结束！")
