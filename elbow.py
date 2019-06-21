@@ -12,11 +12,13 @@ import matplotlib.pyplot as plt
 import readAndWriteDataSet
 import multiprocessing
 import numpy as np
-import getCovMatrix
+import tools
 import kmeans
 import pca
 
 
+# 确定维度，改变聚类中心数量
+# 确定聚类中心数量，改变维度
 def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
     # 检查参数合理性
     if low <= 0:
@@ -59,22 +61,22 @@ def elbow(channelDataAll, low, high, step, a, iRateOrK, schedule, type):
         plt.xlabel(u'保留维度k')
 
     # 修饰一下曲线
-    for i in range(1, len(SSE_C)):
+    for i in range(1, np.shape(SSE_C)[0]):
         if SSE_C[i] < SSE_C[i - 1]:
             next = i + 1
-            while next < len(SSE_C) and SSE_C[next] < SSE_C[i - 1]:
+            while next < np.shape(SSE_C)[0] and SSE_C[next] < SSE_C[i - 1]:
                 next += 1
-            if (next < len(SSE_C)):
+            if (next < np.shape(SSE_C)[0]):
                 SSE_C[i] = ((SSE_C[next] - SSE_C[i - 1]) / (next - i + 1)) + SSE_C[i - 1]
             else:
                 SSE_C[i] = 2 * SSE_C[i - 1] - SSE_C[i]
 
-    for i in range(1, len(SSE_U)):
+    for i in range(1, np.shape(SSE_U)[0]):
         if SSE_U[i] < SSE_U[i - 1]:
             next = i + 1
-            while next < len(SSE_U) and SSE_U[next] < SSE_U[i - 1]:
+            while next < np.shape(SSE_U)[0] and SSE_U[next] < SSE_U[i - 1]:
                 next += 1
-            if (next < len(SSE_U)):
+            if (next < np.shape(SSE_U)[0]):
                 SSE_U[i] = ((SSE_U[next] - SSE_U[i - 1]) / (next - i + 1)) + SSE_U[i - 1]
             else:
                 SSE_U[i] = 2 * SSE_U[i - 1] - SSE_U[i]
@@ -113,25 +115,25 @@ def elbowCore(channelDataAll, a, k, iRate, schedule):
             channelDataPage = channelDataAll[h]
             channelData.append(channelDataPage[:, g * sub:(g + 1) * sub])
 
-        covMatrixList = getCovMatrix.getCovMatrixList(channelData)
-        allCovMatrix = getCovMatrix.matrixListToMatrix(covMatrixList)
+        covMatrixList = tools.getCovMatrixList(channelData)
+        allCovMatrix = tools.matrixListToMatrix(covMatrixList)
 
         # 对协方差进行聚类
         centroids, clusterAssment = kmeans.KMeansOushi(allCovMatrix, k)
-        centroidList = getCovMatrix.matrixToMatrixList(centroids)
+        centroidList = tools.matrixToMatrixList(centroids)
 
         # 计算原信道信息量、协方差矩阵特征值、变换矩阵
-        informations, SigmaList, UList = getCovMatrix.getInformations(covMatrixList)
+        informations, SigmaList, UList = tools.getInformations(covMatrixList)
 
         # 分析PCA效果,计算信息量保留程度
         tmpRates = pca.pca(channelData, informations, centroidList, clusterAssment, iRate)[3][0][:, 1]
         rates_C.append(np.mean(tmpRates))
 
         # 对变换矩阵进行聚类
-        allU = getCovMatrix.matrixListToMatrix_U(UList)
-        weights = getCovMatrix.matrixListToMatrix_U(SigmaList)
+        allU = tools.matrixListToMatrix_U(UList)
+        weights = tools.matrixListToMatrix_U(SigmaList)
         centroids, clusterAssment = kmeans.KMeansOushi_U(allU, k, weights, iRate)
-        centroidList = getCovMatrix.matrixToMatrixList_U(centroids)
+        centroidList = tools.matrixToMatrixList_U(centroids)
 
         # 分析PCA效果,计算信息量保留程度
         tmpRates = pca.pca_U(channelData, informations, centroidList, clusterAssment, iRate)[3][0][:, 1]
@@ -142,9 +144,7 @@ def elbowCore(channelDataAll, a, k, iRate, schedule):
         rates_S.append(np.mean(tmpRates))
 
         # 显示进度
-        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(
-            schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
-                      schedule[1] / schedule[0] * 100) + u'！')
+        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100) + u'！')
 
     rate_C = np.mean(rates_C)
     rate_U = np.mean(rates_U)
@@ -153,6 +153,7 @@ def elbowCore(channelDataAll, a, k, iRate, schedule):
     return rate_S.real, rate_C.real, rate_U.real
 
 
+# 用标准PCA选择k
 def elbow2(channelDataAll, low, high, step, a, schedule):
     # 检查参数合理性
     if low <= 0:
@@ -181,10 +182,10 @@ def elbow2(channelDataAll, low, high, step, a, schedule):
             channelDataPage = channelDataAll[h]
             channelData.append(channelDataPage[:, g * sub:(g + 1) * sub])
 
-        covMatrixList = getCovMatrix.getCovMatrixList(channelData)
+        covMatrixList = tools.getCovMatrixList(channelData)
 
         # 计算原信道信息量、协方差矩阵特征值、变换矩阵
-        informations, SigmaList, UList = getCovMatrix.getInformations(covMatrixList)
+        informations, SigmaList, UList = tools.getInformations(covMatrixList)
         for h in range(time1):
             tmpRates = pca.pca_S(SigmaList, h * step + low)[0][:, 1]
             rates_S[g, h] = np.mean(tmpRates).real

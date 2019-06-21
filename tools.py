@@ -23,6 +23,7 @@ def getCorrMatrixList(matrixList):
     return corrMatrixList
 
 
+# 一个协方差矩阵变成一行
 def matrixListToMatrix(covMatrixList):
     m, n = np.shape(covMatrixList[0])
     allCovMatrix = np.array(np.zeros((len(covMatrixList), (int)(0.5 * (n ** 2 + n)))), dtype=complex)
@@ -31,11 +32,6 @@ def matrixListToMatrix(covMatrixList):
         cur = 0
         for j in range(n):
             for k in range(j, n):
-                # 考虑太小的量是否忽略不计
-                # if curMatrix[j, k] >= 0.1:
-                #     allCovMatrix[i, cur] = curMatrix[j, k]
-                # else:
-                #     allCovMatrix[i, cur] = 0
                 allCovMatrix[i, cur] = curMatrix[j, k]
                 cur += 1
     return allCovMatrix
@@ -65,6 +61,7 @@ def matrixListToMatrix_U(UList):
     return allU
 
 
+# 一行变成一个协方差矩阵
 def matrixToMatrixList(allCovMatrix):
     covMatrixList = []
     # m个协方差矩阵，每个协方差矩阵是p*p的
@@ -85,6 +82,7 @@ def matrixToMatrixList(allCovMatrix):
     return covMatrixList
 
 
+# 单纯的把一行拉成一个矩阵,列先走
 def matrixToMatrixList_U(allU):
     UList = []
     # m个变换矩阵，每个变换矩阵是p*p的
@@ -98,6 +96,7 @@ def matrixToMatrixList_U(allU):
     return UList
 
 
+# 根据协方差矩阵列表，获得信息量、权重列表、变换矩阵列表
 def getInformations(covMatrixList):
     informations = []
     SigmaList = []
@@ -105,7 +104,7 @@ def getInformations(covMatrixList):
     UList = []
     for i in range(len(covMatrixList)):
         try:
-            U, Sigma, VT = np.linalg.svd(covMatrixList[i], full_matrices=0)
+            U, Sigma, VT = np.linalg.svd(covMatrixList[i])
             UList.append(np.transpose(VT))
             sum = np.sum(Sigma)
             # 将SigmaList中的值换成权重
@@ -121,6 +120,7 @@ def getInformations(covMatrixList):
     return informations, SigmaList, UList
 
 
+# 输入复数矩阵，获得幅度矩阵
 def getAbs(matrix):
     try:
         m, n = np.shape(matrix)
@@ -136,6 +136,20 @@ def getAbs(matrix):
             tmpAbs.dtype = 'float32'
             result.append(tmpAbs)
     return result
+
+
+# 二维列表到二维数组
+def listToArray(listObj):
+    m = len(listObj)
+    n = len(listObj[0])
+    out = np.array(np.zeros((m, n)))
+    for i in range(m):
+        for j in range(n):
+            try:
+                out[i, j] = listObj[i][j]
+            except:
+                out[i, j] = 0
+    return out
 
 
 if __name__ == '__main__':

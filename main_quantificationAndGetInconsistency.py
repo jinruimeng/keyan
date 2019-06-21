@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import readAndWriteDataSet
 import kmeans
-import getCovMatrix
+import tools
 import numpy as np
 import multiprocessing
 import os
@@ -30,25 +30,22 @@ def cluster(schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentro
         channelData1 = []
         channelData2 = []
 
-        for i in range(len(channelDataAll1)):
+        for i in range(np.shape(channelDataAll1)[0]):
             channelData1.append(channelDataAll1[i][:, (g - 1) * sub:g * sub])
             channelData2.append(channelDataAll2[i][:, (g - 1) * sub:g * sub])
 
             # 计算信道协方差矩阵呢
-        covMatrixList1 = getCovMatrix.getCovMatrixList(channelData1)
+        covMatrixList1 = tools.getCovMatrixList(channelData1)
 
-        newChannelData01, newChannelData02 = clusterCore(channelData1, covMatrixList1, channelData2,
-                                                         allCentroidsC[g - 1],
-                                                         allCentroidUList[g - 1], "S")
-        newChannelData1, newChannelData2 = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsC[g - 1],
-                                                       allCentroidUList[g - 1], "C")
+        newChannelData01, newChannelData02 = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsC[g - 1], allCentroidUList[g - 1], "S")
+        newChannelData1, newChannelData2 = clusterCore(channelData1, covMatrixList1, channelData2, allCentroidsC[g - 1], allCentroidUList[g - 1], "C")
 
         # 量化并计算不一致率
         for i in range(low, high + 1, step):
             bit_inconsistencyRates_old = []
             bit_inconsistencyRates_new_noCom = []
             bit_inconsistencyRates_new = []
-            for j in range(len(channelData1)):
+            for j in range(np.shape(channelData1)[0]):
                 oldKey1, oldKey2 = quantification.quantificate(channelData1[j], channelData2[j], i)
                 newKey01, newKey02 = quantification.quantificate(newChannelData01[j], newChannelData02[j], i)
                 newKey1, newKey2 = quantification.quantificate(newChannelData1[j], newChannelData2[j], i)
@@ -67,11 +64,9 @@ def cluster(schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentro
                 inconsistencyRates_new_noCom[i - low] += mean(bit_inconsistencyRates_new_noCom)
                 inconsistencyRates_new[i - low] += mean(bit_inconsistencyRates_new)
         # 显示进度
-        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(
-            schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
-                      schedule[1] / schedule[0] * 100) + u'！')
+        print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100) + u'！')
 
-    for g in range(len(inconsistencyRates_old)):
+    for g in range(np.shape(inconsistencyRates_old)[0]):
         inconsistencyRates_old[g] = inconsistencyRates_old[g] / (1 << a)
         inconsistencyRates_new_noCom[g] = inconsistencyRates_new_noCom[g] / (1 << a)
         inconsistencyRates_new[g] = inconsistencyRates_new[g] / (1 << a)
@@ -82,40 +77,41 @@ def clusterCore(channelData1, covMatrixList1, channelData2, centroids, centroidU
     newChannelData1 = []
     newChannelData2 = []
     newDimension = np.shape(centroidUList[0])[1]
+    p = np.shape(channelData1)[0]
 
     if type == "C":
         # 计算信道相关系数矩阵并输出，然后放到一个矩阵中
-        allCovMatrix1 = getCovMatrix.matrixListToMatrix(covMatrixList1)
+        allCovMatrix1 = tools.matrixListToMatrix(covMatrixList1)
 
         # 确定每个数据分别属于哪个簇
         clusterAssment = kmeans.getClusterAssment(allCovMatrix1, centroids)
 
         # 变换域
-        for i in range(len(channelData1)):
+        for i in range(p):
             newChannelData1.append(np.dot(channelData1[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
             newChannelData2.append(np.dot(channelData2[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
 
     if type == "U":
-        informations, SigmaList, UList = getCovMatrix.getInformations(covMatrixList1)
-        allU = getCovMatrix.matrixListToMatrix_U(UList)
-        weights = getCovMatrix.matrixListToMatrix_U(SigmaList)
+        informations, SigmaList, UList = tools.getInformations(covMatrixList1)
+        allU = tools.matrixListToMatrix_U(UList)
+        weights = tools.matrixListToMatrix_U(SigmaList)
 
         # 确定每个数据分别属于哪个簇
         clusterAssment = kmeans.getClusterAssment_U(allU, weights, centroids, newDimension)
 
         # 变换域
-        for i in range(len(channelData1)):
+        for i in range(p):
             newChannelData1.append(np.dot(channelData1[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
             newChannelData2.append(np.dot(channelData2[i], centroidUList[(int)(clusterAssment[i, 0].real)]))
 
     if type == "S":
-        covMatrixList2 = getCovMatrix.getCovMatrixList(channelData2)
-        UList1 = getCovMatrix.getInformations(covMatrixList1)[2]
-        UList2 = getCovMatrix.getInformations(covMatrixList2)[2]
+        covMatrixList2 = tools.getCovMatrixList(channelData2)
+        UList1 = tools.getInformations(covMatrixList1)[2]
+        UList2 = tools.getInformations(covMatrixList2)[2]
         iRate = np.shape(centroidUList[0])[1]
 
         # 变换域
-        for i in range(len(channelData1)):
+        for i in range(p):
             newChannelData1.append(np.dot(channelData1[i], UList1[i][:, 0:iRate]))
             newChannelData2.append(np.dot(channelData2[i], UList2[i][:, 0:iRate]))
 
@@ -163,7 +159,7 @@ if __name__ == '__main__':
     channelDataPath = path + u'channelDataP.xlsx'
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
     n = np.shape(channelDataAll[0])[1]  # 列数
-    p = len(channelDataAll)  # 页数
+    p = np.shape(channelDataAll)[0]  # 页数
     sub = n >> a
 
     if iRate > sub:
@@ -175,67 +171,10 @@ if __name__ == '__main__':
         sys.exit()
 
     # 读入协方差聚类中心，计算变换矩阵
-    allCentroidsC = []
-    allCentroidUList = []
-    for g in range(1, (1 << a) + 1):
-        # 读取聚类中心
-        centroidListPath = path + "getCentroids_outCentroidList_" + "C" + "_" + str(g) + "_"
-        # 合并多个文件
-        centroidList_g = []
-        UList_g = []
-        for root, dirs, files in os.walk(path, topdown=True):
-            for file in files:
-                file = os.path.join(root, file)
-                if centroidListPath in file:
-                    centroidListTmp = readAndWriteDataSet.excelToMatrixList(file)
-                    for centroid in centroidListTmp:
-                        centroidList_g.append(centroid)
-            break
-        # 计算聚类中心的变换矩阵
-        for i in range(len(centroidList_g)):
-            U, Sigma, VT = np.linalg.svd(centroidList_g[i])
-            sum = np.sum(Sigma)
-            curSum = 0
-            index = 0
-            if iRate <= 1:
-                for j in range(len(Sigma)):
-                    curSum += Sigma[j]
-                    if iRate - (curSum / sum) > 0:
-                        index += 1
-                    else:
-                        break
-            else:
-                index = iRate - 1
-            U2 = np.transpose(VT[0:index + 1, :])
-            UList_g.append(U2)
-        allCentroidsC.append(getCovMatrix.matrixListToMatrix(centroidList_g))
-        allCentroidUList.append(UList_g)
-
+    allCentroidsC, allCentroidUList = readAndWriteDataSet.readCentroids(path, iRate, u'C', a)
     # 读入变换矩阵聚类中心，计算变换矩阵
-    # allCentroidsU = []
-    # allCentroidUList2 = []
-    # for g in range(1, (1 << a) + 1):
-    #     # 读取聚类中心
-    #     centroidListPath = path + "getCentroids_outCentroidList_" + "U" + "_" + str(g) + "_"
-    #     # 合并多个文件
-    #     centroidList_g = []
-    #     UList_g = []
-    #     for root, dirs, files in os.walk(path, topdown=True):
-    #         for file in files:
-    #             file = os.path.join(root, file)
-    #             if centroidListPath in file:
-    #                 centroidListTmp = readAndWriteDataSet.excelToMatrixList(file)
-    #                 for centroid in centroidListTmp:
-    #                     centroidList_g.append(centroid)
-    #         break
-    #
-    #     # 计算聚类中心的变换矩阵
-    #     for i in range(len(centroidList_g)):
-    #         U2 = centroidList_g[i][:, 0:iRate]
-    #         UList_g.append(U2)
-    #     allCentroidsU.append(getCovMatrix.matrixListToMatrix_U(centroidList_g))
-    #     allCentroidUList2.append(UList_g)
-    #
+    # allCentroidsU, allCentroidUList2 = readAndWriteDataSet.readCentroids(path, iRate, u'U', a)
+
     total_inconsistency_rate_old = []
     total_inconsistency_rate_new_noCom = []
     total_inconsistency_rate_new = []
@@ -246,16 +185,12 @@ if __name__ == '__main__':
         # 添加噪声
         channelDataAll1 = []
         channelDataAll2 = []
-        for i in range(len(channelDataAll)):
-            channelDataAll1.append(channelDataAll[i] + addNoise.wgn(channelDataAll[i], SNR))
-            channelDataAll2.append(channelDataAll[i] + addNoise.wgn(channelDataAll[i], SNR))
+        for i in range(np.shape(channelDataAll)[0]):
+            noise1, noise2, npower = addNoise.wgn_abs(channelDataAll[i], SNR)
+            channelDataAll1.append(channelDataAll[i] + noise1)
+            channelDataAll2.append(channelDataAll[i] + noise2)
 
-        inconsistency_rate_old, inconsistency_rate_new_noCom, inconsistency_rate_new = cluster(schedule,
-                                                                                               channelDataAll1,
-                                                                                               channelDataAll2,
-                                                                                               allCentroidsC,
-                                                                                               allCentroidUList, a,
-                                                                                               low2, high2, step2)
+        inconsistency_rate_old, inconsistency_rate_new_noCom, inconsistency_rate_new = cluster(schedule, channelDataAll1, channelDataAll2, allCentroidsC, allCentroidUList, a, low2, high2, step2)
         total_inconsistency_rate_old.append(inconsistency_rate_old)
         total_inconsistency_rate_new_noCom.append(inconsistency_rate_new_noCom)
         total_inconsistency_rate_new.append(inconsistency_rate_new)
@@ -270,8 +205,7 @@ if __name__ == '__main__':
 
     path = u'/Users/jinruimeng/Downloads/keyan/'
     nowTime = time.strftime("%Y-%m-%d.%H.%M.%S", time.localtime(time.time()))
-    pathSuffix = u'SNR：' + str(low) + u'to' + str(high) + u'_' + u'bit：' + str(low2) + u'to' + str(
-        high2) + u'_' + nowTime
+    pathSuffix = u'SNR：' + str(low) + u'to' + str(high) + u'_' + u'bit：' + str(low2) + u'to' + str(high2) + u'_' + nowTime
     outOldInconsistencyPath = path + "clusterAddNoise_outOldInconsistency_" + pathSuffix
     outNewInconsistencyNoComPath = path + "clusterAddNoise_outNewInconsistencyNoCom_" + pathSuffix
     outNewInconsistencyPath = path + "clusterAddNoise_outNewInconsistency_" + pathSuffix

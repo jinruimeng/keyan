@@ -10,7 +10,7 @@ plt.rcParams['axes.unicode_minus'] = False
 import matplotlib.pyplot as plt
 
 import readAndWriteDataSet
-import getCovMatrix
+import tools
 import cv2
 
 if __name__ == '__main__':
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
-    channelData = getCovMatrix.getAbs(channelDataAll[0])
+    channelData = tools.getAbs(channelDataAll[0])
     channelData3 = channelData - np.mean(np.mean(channelData))
     channelData2 = channelData3[0, ::2]
     # covMatrix = np.corrcoef(channelData3, rowvar=False)

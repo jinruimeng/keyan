@@ -98,8 +98,7 @@ def KMeansOushi_U(dataSet, k, weights, newDimension):
                 # 计算该样本到质心的加权距离
                 distance = 0
                 for a in range(p):
-                    distance += getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension],
-                                                          dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
+                    distance += getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension], dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
                 if distance < minDist:
                     minDist = distance
                     minIndex = j
@@ -117,9 +116,7 @@ def KMeansOushi_U(dataSet, k, weights, newDimension):
         for i in range(m):
             distance = 0
             for j in range(newDimension):
-                distance += getDistance.oushiDistance(
-                    centroids[int(clusterAssment[i, 0].real), j * p:j * p + newDimension],
-                    dataSet[i, j * p:j * p + newDimension]) * weights[i, j]
+                distance += getDistance.oushiDistance(centroids[int(clusterAssment[i, 0].real), j * p:j * p + newDimension], dataSet[i, j * p:j * p + newDimension]) * weights[i, j]
             clusterAssment[i, 1] = distance
         if count2 > 0:
             clusterChange = True
@@ -206,8 +203,7 @@ def KMeansMashi(dataSet, k):
     IcovMatrix = np.linalg.inv(covMatrix)
 
     for i in range(m):
-        clusterAssment[i, 1] = getDistance.mashiDistance(centroids[int(clusterAssment[i, 0]), :], dataSet[i, :],
-                                                         IcovMatrix)
+        clusterAssment[i, 1] = getDistance.mashiDistance(centroids[int(clusterAssment[i, 0]), :], dataSet[i, :], IcovMatrix)
     print("Congratulations,cluster complete!")
     print("centroids:\n", centroids)
     print("clusterAssment:\n", clusterAssment)
@@ -270,8 +266,7 @@ def getClusterAssment_U(dataSet, weights, centroids, newDimension):
             # 计算该样本到质心的加权距离
             distance = 0
             for a in range(p):
-                distance += getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension],
-                                                      dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
+                distance += getDistance.oushiDistance(centroids[j, a * p:a * p + newDimension], dataSet[i, a * p:a * p + newDimension]) * weights[i, a]
             if distance < minDist:
                 minDist = distance
                 minIndex = j

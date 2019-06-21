@@ -1,6 +1,6 @@
 import readAndWriteDataSet
 import kmeans
-import getCovMatrix
+import tools
 import pca
 import time
 import numpy as np
@@ -44,11 +44,11 @@ def cluster(schedule, path, suffix, channelData, g, iRate):
                 for centroid in centroidListTmp:
                     centroidList.append(centroid)
         break
-    centroids = getCovMatrix.matrixListToMatrix(centroidList)
+    centroids = tools.matrixListToMatrix(centroidList)
 
     # 计算信道相关系数矩阵并输出，然后放到一个矩阵中
-    covMatrixList = getCovMatrix.getCovMatrixList(channelData)
-    allCovMatrix = getCovMatrix.matrixListToMatrix(covMatrixList)
+    covMatrixList = tools.getCovMatrixList(channelData)
+    allCovMatrix = tools.matrixListToMatrix(covMatrixList)
 
     # 确定每个数据分别属于哪个簇
     clusterAssment = kmeans.getClusterAssment(allCovMatrix, centroids)
@@ -56,8 +56,7 @@ def cluster(schedule, path, suffix, channelData, g, iRate):
     clusterAssmentList.append(clusterAssment)
 
     # 分析PCA效果
-    newChannelData, newCovMatrixList, UTs, rates = pca.pca(channelData, covMatrixList, centroidList, clusterAssment,
-                                                           iRate)
+    newChannelData, newCovMatrixList, UTs, rates = pca.pca(channelData, covMatrixList, centroidList, clusterAssment, iRate)
 
     # 输出结果
     # 输出聚类结果
@@ -71,9 +70,7 @@ def cluster(schedule, path, suffix, channelData, g, iRate):
     readAndWriteDataSet.write(rates, ratesPath, suffix)
 
     # 显示进度
-    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(
-        schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (
-                  schedule[1] / schedule[0] * 100) + u'！')
+    print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分完成，' + u'已完成' + str(schedule[1]) + u'部分，' + u'完成度：' + '%.2f%%' % (schedule[1] / schedule[0] * 100) + u'！')
 
 
 if __name__ == '__main__':

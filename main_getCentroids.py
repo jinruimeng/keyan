@@ -1,13 +1,13 @@
 import multiprocessing
 import readAndWriteDataSet
-import getCovMatrix
+import tools
 import kmeans
 import pca
 import time
 import numpy as np
 
 
-def getCentroids(schedule, path, suffix, channelData, g, k, iRate, type="C"):
+def getCentroids(schedule, path, suffix, channelData, g, k, iRate, type=u'C'):
     # 校验数据正确性
     if k > np.shape(channelData)[0]:
         print(u'聚类中心数量不能大于样本数量！')
@@ -24,10 +24,10 @@ def getCentroids(schedule, path, suffix, channelData, g, k, iRate, type="C"):
     print(u'共' + str(schedule[0]) + u'部分，' + u'第' + str(tmpSchedule) + u'部分开始！')
 
     # 得到相关系数矩阵并输出,然后放到一个矩阵中
-    covMatrixList = getCovMatrix.getCovMatrixList(channelData)
-    informations, SigmaList, UList = getCovMatrix.getInformations(covMatrixList)
+    covMatrixList = tools.getCovMatrixList(channelData)
+    informations, SigmaList, UList = tools.getInformations(covMatrixList)
 
-    if type == "total":
+    if type == u'total':
         # 对协方差进行聚类
         getCentroidsCore(path, suffix, channelData, covMatrixList, informations, SigmaList, UList, g, k, iRate, "C")
         # 对变换矩阵进行聚类
@@ -59,30 +59,30 @@ def getCentroidsCore(path, suffix, channelData, covMatrixList, informations, Sig
     UTs = []
     rates = []
 
-    if type == "C":
-        allCovMatrix = getCovMatrix.matrixListToMatrix(covMatrixList)
+    centroidList = []
+
+    if type == u'C':
+        allCovMatrix = tools.matrixListToMatrix(covMatrixList)
 
         # 对协方差进行聚类
         centroids, clusterAssment = kmeans.KMeansOushi(allCovMatrix, k)
         clusterAssmentList.append(clusterAssment)
+        centroidList = tools.matrixToMatrixList(centroids)
 
         # 分析PCA效果
-        centroidList = getCovMatrix.matrixToMatrixList(centroids)
-        newChannelData, newCovMatrixList, UTs, rates = pca.pca(channelData, informations, centroidList, clusterAssment,
-                                                               iRate)
+        # newChannelData, newCovMatrixList, UTs, rates = pca.pca(channelData, informations, centroidList, clusterAssment, iRate)
 
-    if type == "U":
-        allU = getCovMatrix.matrixListToMatrix_U(UList)
-        weights = getCovMatrix.matrixListToMatrix_U(SigmaList)
+    if type == u'U':
+        allU = tools.matrixListToMatrix_U(UList)
+        weights = tools.matrixListToMatrix_U(SigmaList)
 
         # 对协方差进行聚类
         centroids, clusterAssment = kmeans.KMeansOushi_U(allU, k, weights, iRate)
         clusterAssmentList.append(clusterAssment)
+        centroidList = tools.matrixToMatrixList_U(centroids)
 
         # 分析PCA效果
-        centroidList = getCovMatrix.matrixToMatrixList_U(centroids)
-        newChannelData, newCovMatrixList, UTs, rates = pca.pca_U(channelData, informations, centroidList,
-                                                                 clusterAssment, iRate)
+        # newChannelData, newCovMatrixList, UTs, rates = pca.pca_U(channelData, informations, centroidList, clusterAssment, iRate)
 
     # 输出结果
     # 输出聚类结果
@@ -90,9 +90,9 @@ def getCentroidsCore(path, suffix, channelData, covMatrixList, informations, Sig
     # 协方差矩阵太大了，先不输出
     # readAndWriteDataSet.write(covMatrixList, outOldCovMatrixListPath, suffix)
     # 聚类中心太大了，先不输出
-    # readAndWriteDataSet.write(centroidList, outCentroidListPath, suffix)
+    readAndWriteDataSet.write(centroidList, outCentroidListPath, suffix)
     # 输出PCA结果
-    readAndWriteDataSet.write(newChannelData, outNewChannelDataPath, suffix)
+    # readAndWriteDataSet.write(newChannelData, outNewChannelDataPath, suffix)
     # readAndWriteDataSet.write(newCovMatrixList, outNewCovMatrixListPath, suffix)
     # readAndWriteDataSet.write(UTs, UTsPath, suffix)
     # readAndWriteDataSet.write(rates, ratesPath, suffix)
@@ -116,9 +116,9 @@ if __name__ == '__main__':
     a = 0  # 拆分成2^a份
     schedule[0] = 1 << a
     sub = n >> a
-    iRate = 5  # 降维后维度
-    k = 3  # 聚类中心数量
-    type = "C"
+    iRate = 8  # 降维后维度
+    k = 7  # 聚类中心数量
+    type = u'total'
 
     for g in range(1, (1 << a) + 1):
         channelData = []

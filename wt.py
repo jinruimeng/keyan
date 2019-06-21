@@ -1,5 +1,5 @@
 import readAndWriteDataSet
-import getCovMatrix
+import tools
 import pywt
 import numpy as np
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # 读取数据
     channelDataPath = path + "channelDataP.xlsx"
     channelDataAll = readAndWriteDataSet.excelToMatrixList(channelDataPath)
-    channelData = getCovMatrix.getAbs(channelDataAll[0])
+    channelData = tools.getAbs(channelDataAll[0])
 
     result = wt(channelData, 5)
 

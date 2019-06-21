@@ -2,6 +2,8 @@ from typing import List, Any
 import xlsxwriter
 import numpy as np
 import xlrd
+import os
+import tools
 
 
 # 每个工作簿作为一组数据，放到list中
@@ -92,20 +94,59 @@ def write(outData, path, suffix=".xlsx"):
         np.save(path, outData)
 
 
-# 将数据存储成excel
-# List中存的是一维数据
-# def write2(outData, path, suffix=".xlsx"):
-#     if ".xlsx" == suffix:
-#         m = len(outData)
-#         workbook = xlsxwriter.Workbook(path + "_1" + suffix)  # 创建一个Excel文件
-#         worksheet = workbook.add_worksheet()  # 创建sheet
-#         for i in range(m):
-#             tmp = str(outData[i])
-#             worksheet.write_string(i, 1, tmp)
-#         workbook.close()
-#     if ".npy" == suffix:
-#         np.save(path, outData)
+def readCentroids(path, iRate, type, a):
+    allCentroids = []
+    allCentroidUList = []
+    for g in range(1, (1 << a) + 1):
+        # 读取聚类中心
+        centroidListPath = path + u'getCentroids_outCentroidList_' + type + u'_' + str(g) + u'_'
+        # 合并多个文件
+        centroidList_g = []
+        UList_g = []
+        for root, dirs, files in os.walk(path, topdown=True):
+            for file in files:
+                file = os.path.join(root, file)
+                if centroidListPath in file:
+                    centroidListTmp = excelToMatrixList(file)
+                    for centroid in centroidListTmp:
+                        centroidList_g.append(centroid)
+            break
 
+        # 计算聚类中心的变换矩阵
+        if u'C' == type:
+            for i in range(len(centroidList_g)):
+                U, Sigma, VT = np.linalg.svd(centroidList_g[i])
+                sum = np.sum(Sigma)
+                curSum = 0
+                if iRate <= 1:
+                    index = 0
+                    for j in range(len(Sigma)):
+                        curSum += Sigma[j]
+                        if iRate - (curSum / sum) > 0:
+                            index += 1
+                        else:
+                            break
+                else:
+                    index = iRate - 1
+                U2 = np.transpose(VT[0:index + 1, :])
+                UList_g.append(U2)
+            allCentroids.append(tools.matrixListToMatrix(centroidList_g))
+            allCentroidUList.append(UList_g)
+
+        if u'U' == type:
+            for i in range(len(centroidList_g)):
+                U2 = centroidList_g[i][:, 0:iRate]
+                for j in range(np.shape(U2)[1]):
+                    # 噪声功率归一
+                    U2[:, j] = U2[:, j] / np.linalg.norm((U2[:, j]))
+                UList_g.append(U2)
+            allCentroids.append(tools.matrixListToMatrix_U(centroidList_g))
+            allCentroidUList.append(UList_g)
+
+    return allCentroids, allCentroidUList
+
+
+# 二维列表到二维数组
 def listToArray(listObj):
     m = len(listObj)
     n = len(listObj[0])
@@ -115,6 +156,20 @@ def listToArray(listObj):
             out[i, j] = listObj[i][j]
 
     return out
+
+# 将密钥输出到txt中
+def writeKey(path, keys1, keys2, SNR, type):
+    name1 = path + u'/key1_' + str(SNR) + u'_' + type + u'.txt'
+    name2 = path + u'/key2_' + str(SNR) + u'_' + type + u'.txt'
+    data = open(name1, 'w+')
+    for key in keys1:
+        print(key, file=data)
+    data.close()
+
+    data = open(name2, 'w+')
+    for key in keys2:
+        print(key, file=data)
+    data.close()
 
 
 if __name__ == '__main__':

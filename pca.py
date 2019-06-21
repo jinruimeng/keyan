@@ -1,7 +1,7 @@
 import kmeans
 import numpy as np
 import readAndWriteDataSet
-import getCovMatrix
+import tools
 
 
 def pca(channelData, informations, centroidList, clusterAssment, rate=1):
@@ -35,8 +35,8 @@ def pca(channelData, informations, centroidList, clusterAssment, rate=1):
         index = np.shape(newChannelData)[1]
         rates[i, 0] = index
 
-    newCovMatrixList = getCovMatrix.getCovMatrixList(newChannelDataList)
-    newInformations = getCovMatrix.getInformations(newCovMatrixList)[0]
+    newCovMatrixList = tools.getCovMatrixList(newChannelDataList)
+    newInformations = tools.getInformations(newCovMatrixList)[0]
 
     for i in range(len(channelData)):
         rate2 = newInformations[0][i] / informations[0][i]
@@ -64,8 +64,8 @@ def pca_U(channelDataList, informations, centroidList, clusterAssment, newDimens
         newChannelData = np.dot(channelDataList[i], U2s[(int)(clusterAssment[i, 0].real)])
         newChannelDataList.append(newChannelData)
 
-    newCovMatrixList = getCovMatrix.getCovMatrixList(newChannelDataList)
-    newInformation = getCovMatrix.getInformations(newCovMatrixList)[0]
+    newCovMatrixList = tools.getCovMatrixList(newChannelDataList)
+    newInformation = tools.getInformations(newCovMatrixList)[0]
 
     for i in range(len(channelDataList)):
         rate2 = newInformation[0][i] / informations[0][i]
@@ -96,14 +96,14 @@ def pca_general(data, newDimension=1):
         # 计算协方差矩阵 rowvar=False代表每一列是一个变量
         covMatrix = np.cov(data, rowvar=False)
         # SVD分解协方差矩阵得出变换矩阵
-        U = np.transpose(np.linalg.svd(covMatrix, full_matrices=0)[2])
+        U = np.transpose(np.linalg.svd(covMatrix)[2])
         return np.dot(data, U[:, 0:newDimension])
 
     except:
         # 如果输入是多个信道，进行以下步骤
         out = []
-        covList = getCovMatrix.getCovMatrixList(data)
-        UList = getCovMatrix.getInformations(covList)[2]
+        covList = tools.getCovMatrixList(data)
+        UList = tools.getInformations(covList)[2]
         for i in range(len(data)):
             out.append(np.dot(data[i], UList[i][:, 0:newDimension]))
         return out
