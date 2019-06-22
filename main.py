@@ -123,7 +123,6 @@ if __name__ == '__main__':
     # 路径配置
     path = u'/Users/jinruimeng/Downloads/keyan/'
     # path = u'E:\\workspace\\keyan\\'
-    suffix = u'.xlsx'
 
     a = 0  # 分割次数
     iRate = 10  # 预处理后维度
@@ -132,6 +131,7 @@ if __name__ == '__main__':
     low = -10
     high = 30
     step = 5
+    suffix = str(low) + u'to' + str(high) + u'dB'
 
     # 显示进度
     manager = multiprocessing.Manager()
@@ -161,6 +161,8 @@ if __name__ == '__main__':
     allCentroidsU, allCentroidUList2 = readAndWriteDataSet.readCentroids(path, iRate, u'U', a)
 
     newSNRsList = []
+    lengths = np.zeros((4, time1))
+    inconsistencyRates = np.zeros((4, time1))
     for h in range(time1):
         SNR = low + h * step
 
@@ -195,6 +197,7 @@ if __name__ == '__main__':
         key_newWt1 = []
         key_newWt2 = []
         newSNRs = []
+
         for g in range(1 << a):
             for i in range(p):
                 tmpKey1, tmpKey2, SNRList = quantification.quantificate(newPca1[g][i], newPca2[g][i], npowers[i])
@@ -205,6 +208,9 @@ if __name__ == '__main__':
                 # print(tmpKey[1])
                 key_newPca1.append(tmpKey1)
                 key_newPca2.append(tmpKey2)
+                keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
+                lengths[0, h] = keyLength
+                inconsistencyRates[0, h] = errorNum
                 if g == 0 and i == 0:
                     newSNRs.append(SNRList)
                 else:
@@ -218,6 +224,9 @@ if __name__ == '__main__':
                 # print(tmpKey[1])
                 key_newC1.append(tmpKey1)
                 key_newC2.append(tmpKey2)
+                keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
+                lengths[1, h] = keyLength
+                inconsistencyRates[1, h] = errorNum
                 if g == 0 and i == 0:
                     newSNRs.append(SNRList)
                 else:
@@ -231,6 +240,9 @@ if __name__ == '__main__':
                 # print(tmpKey[1])
                 key_newU1.append(tmpKey1)
                 key_newU2.append(tmpKey2)
+                keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
+                lengths[2, h] = keyLength
+                inconsistencyRates[2, h] = errorNum
                 if g == 0 and i == 0:
                     newSNRs.append(SNRList)
                 else:
@@ -244,6 +256,9 @@ if __name__ == '__main__':
                 # print(tmpKey[1])
                 key_newWt1.append(tmpKey1)
                 key_newWt2.append(tmpKey2)
+                keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
+                lengths[3, h] = keyLength
+                inconsistencyRates[3, h] = errorNum
                 if g == 0 and i == 0:
                     newSNRs.append(SNRList)
                 else:
@@ -256,6 +271,7 @@ if __name__ == '__main__':
         readAndWriteDataSet.writeKey(path, key_newU1, key_newU2, SNR, u'U')
         readAndWriteDataSet.writeKey(path, key_newWt1, key_newWt2, SNR, u'wt')
 
-    readAndWriteDataSet.write(newSNRsList, path + u'newSNR_' + str(low) + u'to' + str(high) + u'dB')
-
+    readAndWriteDataSet.write(newSNRsList, path + u'newSNR_' + suffix)
+    readAndWriteDataSet.write(lengths, path + u'length_' + suffix)
+    readAndWriteDataSet.write(inconsistencyRates, path + u'errorNum_' + suffix)
     print("主进程结束！")

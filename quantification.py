@@ -108,12 +108,12 @@ def quantificateWithSNR(data1, data2, SNR):
 def getInconsistencyRate(key1, key2):
     keyLength = len(key1)
     if keyLength <= 0:
-        return 0
+        return 0, 0
     key1List = list(key1)
     key2List = list(key2)
-    num = 0
+    errorNum = 0
     for index in range(len(key1List)):
         if key1List[index] is not key2List[index]:
-            num += 1
+            errorNum += 1
 
-    return num / keyLength
+    return keyLength, errorNum
