@@ -58,33 +58,34 @@ def write(outData, path, suffix=".xlsx"):
     if ".xlsx" == suffix:
         workbook = xlsxwriter.Workbook(path + "_1" + suffix)  # 创建一个Excel文件
         try:
-            h, l = np.shape(outData)
-            worksheet = workbook.add_worksheet()  # 创建sheet
-            for j in range(h):
-                for k in range(l):
-                    tmp = str(outData[j, k])
-                    worksheet.write_string(j, k, tmp)
+            m, h, l = np.shape(outData)
+            buff = 0
+            bn = 2
+            for i in range(m):
+                if buff >= 1800000:
+                    workbook.close()
+                    workbook = xlsxwriter.Workbook(path + "_" + str(bn) + suffix)
+                    buff = 0
+                    bn += 1
+                [h, l] = outData[i].shape
+                worksheet = workbook.add_worksheet()  # 创建sheet
+                for j in range(h):
+                    for k in range(l):
+                        tmp = str(outData[i][j, k])
+                        worksheet.write_string(j, k, tmp)
+                        buff += 1
         except:
-            m = len(outData)
+            print(u'write1')
             try:
-                [h, l] = outData[0].shape
-                buff = 0
-                bn = 2
-                for i in range(m):
-                    if buff >= 1800000:
-                        workbook.close()
-                        workbook = xlsxwriter.Workbook(path + "_" + str(bn) + suffix)
-                        buff = 0
-                        bn += 1
-                    [h, l] = outData[i].shape
-                    worksheet = workbook.add_worksheet()  # 创建sheet
-                    for j in range(h):
-                        for k in range(l):
-                            tmp = str(outData[i][j, k])
-                            worksheet.write_string(j, k, tmp)
-                            buff += 1
+                h, l = np.shape(outData)
+                worksheet = workbook.add_worksheet()  # 创建sheet
+                for j in range(h):
+                    for k in range(l):
+                        tmp = str(outData[j, k])
+                        worksheet.write_string(j, k, tmp)
             except:
-                workbook = xlsxwriter.Workbook(path + "_1" + suffix)  # 创建一个Excel文件
+                print(u'write2')
+                m = np.shape(outData)[0]
                 worksheet = workbook.add_worksheet()  # 创建sheet
                 for i in range(m):
                     tmp = str(outData[i])
@@ -156,6 +157,7 @@ def listToArray(listObj):
             out[i, j] = listObj[i][j]
 
     return out
+
 
 # 将密钥输出到txt中
 def writeKey(path, keys1, keys2, SNR, type):

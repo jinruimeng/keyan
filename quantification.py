@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 # 量化
@@ -22,13 +23,6 @@ def quantificate(channelData1, channelData2, npower):
 
     for i in range(n):
         SNR = (max(abs(covMatrix1[i, i]), abs(covMatrix2[i, i])) / npower) - 1
-        # print(u'i:')
-        # print(str(i))
-        # print(u'SNR0:')
-        # print(SNR)
-        SNR = 10 * np.log10(SNR)
-        # print(u'SNR1:')
-        # print(SNR)
         SNRList.append(SNR)
         tmpKey = quantificateWithSNR(channelData1[:, i], channelData2[:, i], SNR)
         key1List.append(tmpKey[0])
@@ -43,12 +37,14 @@ def quantificate(channelData1, channelData2, npower):
                 except:
                     continue
         except:
+            print(u'quantificate2')
             continue
 
     return key1, key2, SNRList
 
 
 def quantificateWithSNR(data1, data2, SNR):
+    SNR = 10 * np.log10(SNR)
     tmpKey1 = []
     tmpKey2 = []
 
@@ -117,3 +113,34 @@ def getInconsistencyRate(key1, key2):
             errorNum += 1
 
     return keyLength, errorNum
+
+
+# 计算给定数据集的香农墒的函数
+def calc_shannon_ent(data_set):
+    # 求list的长度，表示计算参与训练的数据量
+    num_entries = len(data_set)
+    if num_entries <= 0:
+        return 0
+    # 计算分类标签label出现的次数
+    label_counts = {}
+    # the number of unique elements and their occurance
+    for featVec in data_set:
+        # 将当前实例的标签存储，即每一行数据的最后一个数据代表的是标签
+        current_label = featVec[-1]
+        # 为所有可能的分类创建字典，如果当前的健值不存在，则扩展字典并将当前健值加入
+        if current_label not in label_counts.keys():
+            label_counts[current_label] = 0
+        label_counts[current_label] += 1
+    # 对于label标签的占比，求出label标签的香农墒
+    shannon_ent = 0.0
+    for key in label_counts:
+        # 使所有类标签的发生频率计算类别出现的概率
+        prob = float(label_counts[key]) / num_entries
+        shannon_ent -= prob * math.log(prob, 2)
+    return shannon_ent
+
+
+if __name__ == '__main__':
+    data_set = u'01110101010111101111010100010100001111100010101'
+    shannon_ent = calc_shannon_ent(data_set)
+    print(shannon_ent)

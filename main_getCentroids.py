@@ -117,8 +117,8 @@ if __name__ == '__main__':
     schedule[0] = 1 << a
     sub = n >> a
     iRate = 8  # 降维后维度
-    k = 7  # 聚类中心数量
-    type = u'total'
+    k = 1  # 聚类中心数量
+    type = u'C'
 
     for g in range(1, (1 << a) + 1):
         channelData = []

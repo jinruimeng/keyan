@@ -50,6 +50,7 @@ def matrixListToMatrix_U(UList):
                     allU[i, cur] = curU[j, k]
                     cur += 1
     except:
+        print(u'matrixListToMatrix_U')
         m = np.shape(UList[0])[0]
         allU = np.array(np.zeros((len(UList), (int)(m))), dtype=complex)
         for i in range(len(UList)):
@@ -111,6 +112,7 @@ def getInformations(covMatrixList):
             for j in range(len(Sigma)):
                 Sigma[j] = Sigma[j] / sum
         except:
+            print(u'getInformations')
             UList.append((np.ones((1, 1))))
             sum = covMatrixList[i]
             Sigma = np.ones((1, 1))
@@ -129,6 +131,7 @@ def getAbs(matrix):
             for j in range(n):
                 result[i, j] = np.abs(matrix[i, j])
     except:
+        print(u'getAbs')
         m = np.shape(matrix)[0]
         result = []
         for i in range(m):
@@ -148,16 +151,18 @@ def listToArray(listObj):
             try:
                 out[i, j] = listObj[i][j]
             except:
+                print(u'listToArray')
                 out[i, j] = 0
     return out
 
 
 if __name__ == '__main__':
-    datafile = u'E:\\workspace\\keyan\\test2.xlsx'
-    dataSource = readAndWriteDataSet.excelToMatrix(datafile)
-    covMatrixList = getCovMatrixList(dataSource)
-    allCovMatrix = matrixListToMatrix(covMatrixList)
-    print(allCovMatrix)
-    print('\n')
-    covMatrixs2 = matrixToMatrixList(allCovMatrix)
-    print(covMatrixs2)
+    a = []
+    b = []
+    # b.append(1)
+    # b.append(2)
+    # a.append(b)
+    c = np.array(np.zeros((2, 2)))
+    a.append(c)
+    print(np.shape(a))
+    print(len(a))

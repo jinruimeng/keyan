@@ -86,6 +86,7 @@ def pca_S(SigmaList, newDimension=1):
     rateList.append(rates)
     return rateList
 
+
 # pca
 # input: data-信道数据 newDimension-保留维度数
 # output： out-pca处理后的数据
@@ -100,7 +101,8 @@ def pca_general(data, newDimension=1):
         return np.dot(data, U[:, 0:newDimension])
 
     except:
-        # 如果输入是多个信道，进行以下步骤
+        print(u'pca_general')
+        # 如果输入是列表，进行以下步骤
         out = []
         covList = tools.getCovMatrixList(data)
         UList = tools.getInformations(covList)[2]
