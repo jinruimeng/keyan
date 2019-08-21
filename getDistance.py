@@ -14,15 +14,29 @@ def oushiDistance(x, y):
     #         sum += abs(x[i] - y[i])
 
     sum = np.linalg.norm((x - y))
-    return sum
-    # return abs(np.corrcoef(x, y))  # 计算相关系数的绝对值
+    return sum  # return abs(np.corrcoef(x, y))  # 计算相关系数的绝对值
 
-# 马氏距离计算
-def mashiDistance(x, y, IcovMatrix):
-    dif = x - y
-    distance = abs(np.dot(dif, np.dot(IcovMatrix, np.transpose(dif))))
-    return distance
+# 输入为理想信道数据，无噪声
+def costFunction(x, U, npower):
+    x2 = np.dot(x, U)
+    U, Sigma, VT = np.linalg.svd(np.cov(x2, rowvar=False))
+    I = 0
+    for i in range(len(Sigma)):
+        A = (1 + npower / Sigma[i]) ** (-2)
+        B = (1 - A) ** (-1)
+        I += math.log(B, 2)
+    return I
 
+# 输入为实际信道数据，有噪声
+def costFunction2(x, U, npower):
+    x2 = np.dot(x, U)
+    U, Sigma, VT = np.linalg.svd(np.cov(x2, rowvar=False))
+    I = 0
+    for i in range(len(Sigma)):
+        A = (1 + npower / Sigma[i] - npower) ** (-2)
+        B = (1 - A) ** (-1)
+        I += math.log(B, 2)
+    return I
 
 if __name__ == '__main__':
     # 第一列

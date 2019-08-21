@@ -8,11 +8,6 @@ import math
 def quantificate(channelData1, channelData2, npower):
     SNRList = []
     m, n = np.shape(channelData1)
-    for i in range(m):
-        # 本方案对幅度进行量化
-        for j in range(n):
-            channelData1[i, j] = abs(channelData1[i, j])
-            channelData2[i, j] = abs(channelData2[i, j])
 
     key1 = u''
     key2 = u''
@@ -22,7 +17,8 @@ def quantificate(channelData1, channelData2, npower):
     key2List = []
 
     for i in range(n):
-        SNR = (max(abs(covMatrix1[i, i]), abs(covMatrix2[i, i])) / npower) - 1
+        SNR = (max(covMatrix1[i, i].real, covMatrix2[i, i].real) / npower) - 1
+        SNR = 10 * np.log10(SNR)
         SNRList.append(SNR)
         tmpKey = quantificateWithSNR(channelData1[:, i], channelData2[:, i], SNR)
         key1List.append(tmpKey[0])
@@ -37,51 +33,54 @@ def quantificate(channelData1, channelData2, npower):
                 except:
                     continue
         except:
-            print(u'quantificate2')
+            print(u'超出范围')
             continue
 
     return key1, key2, SNRList
 
 
 def quantificateWithSNR(data1, data2, SNR):
-    SNR = 10 * np.log10(SNR)
+    # SNR = 10 * np.log10(SNR)
     tmpKey1 = []
     tmpKey2 = []
 
-    if SNR >= 51.1:
-        bitNum = 11
+    if SNR >= 37:
+        bitNum = 12
     else:
-        if SNR >= 48.2:
-            bitNum = 10
+        if SNR >= 34.5:
+            bitNum = 11
         else:
-            if SNR >= 45.2:
-                bitNum = 9
+            if SNR >= 31.3:
+                bitNum = 10
             else:
-                if SNR >= 42.3:
-                    bitNum = 8
+                if SNR >= 28.1:
+                    bitNum = 9
                 else:
-                    if SNR >= 39.3:
-                        bitNum = 7
+                    if SNR >= 25:
+                        bitNum = 8
                     else:
-                        if SNR >= 36.3:
-                            bitNum = 6
+                        if SNR >= 22.9:
+                            bitNum = 7
                         else:
-                            if SNR >= 33.3:
-                                bitNum = 5
+                            if SNR >= 19.8:
+                                bitNum = 6
                             else:
-                                if SNR >= 30.4:
-                                    bitNum = 4
+                                if SNR >= 17:
+                                    bitNum = 5
                                 else:
-                                    if SNR >= 27.4:
-                                        bitNum = 3
+                                    if SNR >= 14:
+                                        bitNum = 4
                                     else:
-                                        if SNR >= 24.5:
-                                            bitNum = 2
+                                        if SNR >= 10.5:
+                                            bitNum = 3
                                         else:
-                                            if SNR >= 15.4:
-                                                bitNum = 1
+                                            if SNR >= 7:
+                                                bitNum = 2
                                             else:
-                                                return tmpKey1, tmpKey2
+                                                if SNR >= 3:
+                                                    bitNum = 1
+                                                else:
+                                                    return tmpKey1, tmpKey2
 
     # 确定密钥形式，后续可以考虑引入格雷码
     keyFormat = "{0:0" + str(bitNum) + "b}"

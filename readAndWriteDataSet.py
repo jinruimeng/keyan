@@ -15,7 +15,7 @@ def excelToMatrixList(path):
         table = sheets[k]  # 获取一个sheet表
         row = table.nrows  # 行数
         col = table.ncols  # 列数
-        matrix = np.array(np.zeros((row, col)), dtype=complex)
+        matrix = np.array(np.zeros((row, col)))
         for x in range(row):
             rows = np.matrix(table.row_values(x))
             matrix[x, :] = rows
@@ -27,7 +27,7 @@ def excelToMatrixList(path):
 def excelToMatrix(path):
     wb = xlrd.open_workbook(path)
     sheets: List[Any] = wb.sheets()
-    matrix = np.array(np.zeros((len(sheets), sheets[0].nrows * sheets[0].ncols)), dtype=complex)
+    matrix = np.array(np.zeros((len(sheets), sheets[0].nrows * sheets[0].ncols)))
     for k in range(len(sheets)):
         table = sheets[k]  # 获取第一个sheet表
         row = table.nrows  # 行数
@@ -46,7 +46,7 @@ def excelToMatrix2(path, k=0):
     table = sheets[k]
     row = table.nrows  # 行数
     col = table.ncols  # 列数
-    matrix = np.array(np.zeros((row, col)), dtype=complex)  # 生成一个nrows行ncols列，且元素均为0的初始矩阵
+    matrix = np.array(np.zeros((row, col)))  # 生成一个nrows行ncols列，且元素均为0的初始矩阵
     for x in range(col):
         cols = np.matrix(table.col_values(x))  # 把list转换为矩阵进行矩阵操作
         matrix[:, x] = cols  # 按列把数据存进矩阵中

@@ -13,10 +13,10 @@ def wt(channelData, newDimension=1):
     tmp = []
     while len(result[0]) > newDimension:
         for i in range(m):
-            tmp.append(pywt.dwt(result[i], 'haar')[0])
+            tmp.append(pywt.dwt(result[i][0:((int)(len(result[0]) / 2)) * 2], 'haar')[0])
         result = tmp
         tmp = []
-    return np.array(result)
+    return tools.listToArray(result)
 
 
 if __name__ == '__main__':

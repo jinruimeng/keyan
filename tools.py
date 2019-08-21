@@ -26,7 +26,7 @@ def getCorrMatrixList(matrixList):
 # 一个协方差矩阵变成一行
 def matrixListToMatrix(covMatrixList):
     m, n = np.shape(covMatrixList[0])
-    allCovMatrix = np.array(np.zeros((len(covMatrixList), (int)(0.5 * (n ** 2 + n)))), dtype=complex)
+    allCovMatrix = np.array(np.zeros((len(covMatrixList), (int)(0.5 * (n ** 2 + n)))))
     for i in range(len(covMatrixList)):
         curMatrix = covMatrixList[i]
         cur = 0
@@ -41,7 +41,7 @@ def matrixListToMatrix(covMatrixList):
 def matrixListToMatrix_U(UList):
     try:
         m, n = np.shape(UList[0])
-        allU = np.array(np.zeros((len(UList), (int)(m * n))), dtype=complex)
+        allU = np.array(np.zeros((len(UList), (int)(m * n))))
         for i in range(len(UList)):
             curU = UList[i]
             cur = 0
@@ -52,7 +52,7 @@ def matrixListToMatrix_U(UList):
     except:
         print(u'matrixListToMatrix_U')
         m = np.shape(UList[0])[0]
-        allU = np.array(np.zeros((len(UList), (int)(m))), dtype=complex)
+        allU = np.array(np.zeros((len(UList), (int)(m))))
         for i in range(len(UList)):
             curU = UList[i]
             cur = 0
@@ -69,7 +69,7 @@ def matrixToMatrixList(allCovMatrix):
     m, n = np.shape(allCovMatrix)
     p = (int)(0.5 * ((1 + 8 * n) ** 0.5 - 1))
     for i in range(m):
-        curMatrix = np.array(np.zeros((p, p)), dtype=complex)
+        curMatrix = np.array(np.zeros((p, p)))
         curRow = 0
         curCol = 0
         for j in range(n):
@@ -90,7 +90,7 @@ def matrixToMatrixList_U(allU):
     m, n = np.shape(allU)
     p = (int)(n ** 0.5)
     for i in range(m):
-        U = np.array(np.zeros((p, p)), dtype=complex)
+        U = np.array(np.zeros((p, p)))
         for j in range(p):
             U[:, j] = allU[i, j * p:(j + 1) * p]
         UList.append(U)
@@ -101,7 +101,7 @@ def matrixToMatrixList_U(allU):
 def getInformations(covMatrixList):
     informations = []
     SigmaList = []
-    information = np.array(np.zeros((len(covMatrixList), 1)), dtype=complex)
+    information = np.array(np.zeros((len(covMatrixList), 1)))
     UList = []
     for i in range(len(covMatrixList)):
         try:

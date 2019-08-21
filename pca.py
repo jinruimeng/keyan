@@ -6,7 +6,7 @@ import tools
 
 def pca(channelData, informations, centroidList, clusterAssment, rate=1):
     U2s = []
-    rates = np.array(np.zeros((len(channelData), 2)), dtype=complex)
+    rates = np.array(np.zeros((len(channelData), 2)))
     rateList = []
     newChannelDataList = []
 
@@ -50,7 +50,7 @@ def pca_U(channelDataList, informations, centroidList, clusterAssment, newDimens
     newChannelDataList = []
     U2s = []
 
-    rates = np.array(np.zeros((len(channelDataList), 2)), dtype=complex)
+    rates = np.array(np.zeros((len(channelDataList), 2)))
     # 为了输出，要把rates放到list中
     rateList = []
 
@@ -76,7 +76,7 @@ def pca_U(channelDataList, informations, centroidList, clusterAssment, newDimens
 
 
 def pca_S(SigmaList, newDimension=1):
-    rates = np.array(np.zeros((len(SigmaList), 2)), dtype=complex)
+    rates = np.array(np.zeros((len(SigmaList), 2)))
     rateList = []
     # 降维
     for i in range(len(SigmaList)):
