@@ -6,7 +6,7 @@ import readAndWriteDataSet
 # out:list形式的协方差
 def getCovMatrixList(matrixList):
     covMatrixList = []
-    for i in range(len(matrixList)):
+    for i in range(np.shape(matrixList)[0]):
         covMatrix = np.cov(matrixList[i], rowvar=False)
         # covMatrix = np.corrcoef(matrixList[i], rowvar=False)
         covMatrixList.append(covMatrix)
@@ -17,7 +17,7 @@ def getCovMatrixList(matrixList):
 # out:list形式的相关系数矩阵
 def getCorrMatrixList(matrixList):
     corrMatrixList = []
-    for i in range(len(matrixList)):
+    for i in range(np.shape(matrixList)[0]):
         corrMatrix = np.corrcoef(matrixList[i], rowvar=False)
         corrMatrixList.append(corrMatrix)
     return corrMatrixList
@@ -26,8 +26,8 @@ def getCorrMatrixList(matrixList):
 # 一个协方差矩阵变成一行
 def matrixListToMatrix(covMatrixList):
     m, n = np.shape(covMatrixList[0])
-    allCovMatrix = np.array(np.zeros((len(covMatrixList), (int)(0.5 * (n ** 2 + n)))))
-    for i in range(len(covMatrixList)):
+    allCovMatrix = np.array(np.zeros((np.shape(covMatrixList)[0], (int)(0.5 * (n ** 2 + n)))))
+    for i in range(np.shape(covMatrixList)[0]):
         curMatrix = covMatrixList[i]
         cur = 0
         for j in range(n):
@@ -41,8 +41,8 @@ def matrixListToMatrix(covMatrixList):
 def matrixListToMatrix_U(UList):
     try:
         m, n = np.shape(UList[0])
-        allU = np.array(np.zeros((len(UList), (int)(m * n))))
-        for i in range(len(UList)):
+        allU = np.array(np.zeros((np.shape(UList)[0], int(m * n))))
+        for i in range(np.shape(UList)[0]):
             curU = UList[i]
             cur = 0
             for k in range(n):
@@ -52,8 +52,8 @@ def matrixListToMatrix_U(UList):
     except:
         print(u'matrixListToMatrix_U')
         m = np.shape(UList[0])[0]
-        allU = np.array(np.zeros((len(UList), (int)(m))))
-        for i in range(len(UList)):
+        allU = np.array(np.zeros((np.shape(UList)[0], int(m))))
+        for i in range(np.shape(UList)[0]):
             curU = UList[i]
             cur = 0
             for j in range(m):
@@ -101,25 +101,34 @@ def matrixToMatrixList_U(allU):
 def getInformations(covMatrixList):
     informations = []
     SigmaList = []
-    information = np.array(np.zeros((len(covMatrixList), 1)))
+    information = np.array(np.zeros((np.shape(covMatrixList)[0], 1)))
     UList = []
-    for i in range(len(covMatrixList)):
+    for i in range(np.shape(covMatrixList)[0]):
         try:
             U, Sigma, VT = np.linalg.svd(covMatrixList[i])
             UList.append(np.transpose(VT))
             sum = np.sum(Sigma)
             # 将SigmaList中的值换成权重
-            for j in range(len(Sigma)):
+            for j in range(np.shape(Sigma)[0]):
                 Sigma[j] = Sigma[j] / sum
         except:
             print(u'getInformations')
-            UList.append((np.ones((1, 1))))
+            UList.append(np.ones((1, 1)))
             sum = covMatrixList[i]
             Sigma = np.ones((1, 1))
         information[i, 0] = sum
         SigmaList.append(Sigma)
     informations.append(information)
     return informations, SigmaList, UList
+
+
+# 求相关系数
+def getCorrelation_coefficientsList(data1, data2):
+    correlation_coefficientList = []
+    m, n = np.shape(data1)
+    for i in range(n):
+        correlation_coefficientList.append(np.corrcoef(data1[:, i], data2[:, i])[0, 1])
+    return correlation_coefficientList
 
 
 # 输入复数矩阵，获得幅度矩阵
@@ -143,8 +152,8 @@ def getAbs(matrix):
 
 # 二维列表到二维数组
 def listToArray(listObj):
-    m = len(listObj)
-    n = len(listObj[0])
+    m = np.shape(listObj)[0]
+    n = np.shape(listObj[0])[0]
     out = np.array(np.zeros((m, n)))
     for i in range(m):
         for j in range(n):

@@ -1,5 +1,8 @@
 import numpy as np
 import math
+import readAndWriteDataSet
+import copy
+from sklearn import metrics
 
 
 # 欧氏距离计算
@@ -13,30 +16,61 @@ def oushiDistance(x, y):
     #     else:
     #         sum += abs(x[i] - y[i])
 
-    sum = np.linalg.norm((x - y))
-    return sum  # return abs(np.corrcoef(x, y))  # 计算相关系数的绝对值
+    # sum = np.linalg.norm((x - y))
+    # return sum
 
-# 输入为理想信道数据，无噪声
-def costFunction(x, U, npower):
-    x2 = np.dot(x, U)
-    U, Sigma, VT = np.linalg.svd(np.cov(x2, rowvar=False))
-    I = 0
-    for i in range(len(Sigma)):
-        A = (1 + npower / Sigma[i]) ** (-2)
-        B = (1 - A) ** (-1)
-        I += math.log(B, 2)
-    return I
+    # 计算相关系数的绝对值
+    corr = - abs(np.corrcoef(x, y)[0, 1])
+    return corr
+
 
 # 输入为实际信道数据，有噪声
-def costFunction2(x, U, npower):
-    x2 = np.dot(x, U)
-    U, Sigma, VT = np.linalg.svd(np.cov(x2, rowvar=False))
-    I = 0
-    for i in range(len(Sigma)):
-        A = (1 + npower / Sigma[i] - npower) ** (-2)
-        B = (1 - A) ** (-1)
-        I += math.log(B, 2)
+# def costFunction(x, U, npower):
+#     x2 = np.dot(x, U)
+#     c1 = np.cov(x2, rowvar=False)
+#     c2 = copy.deepcopy(c1)
+#     for i in range(np.shape(c2)[0]):
+#         for j in range(np.shape(c2)[1]):
+#             c2[i, j] = max(c2[i, j] - npower, 0)
+#     a1 = np.linalg.det(c1)
+#     a2 = np.linalg.det(c1 - np.dot(np.dot(c2, np.linalg.inv(c1)), c2))
+#     if a2 < 0:
+#         a2 = 0
+#     y = a1 / a2
+#     I = math.log(y, 2)
+#     return I
+
+
+# 输入为实际信道数据，有噪声
+def costFunction(x1, x2, U, npower):
+    y1 = np.dot(x1, U)
+    y2 = np.dot(x2, U)
+    # U, Sigma, VT = np.linalg.svd(np.cov(y1, y2, rowvar=False))
+    # I = 0
+    # for i in range(len(Sigma)):
+    #     tmp_npower = min(npower, Sigma[i])
+    #     A = ((Sigma[i] - tmp_npower) / Sigma[i]) ** 2
+    #     B = (1 - A) ** (-1)
+    #     I += math.log(B, 2)
+    z1 = []
+    z2 = []
+    for i in range(np.shape(y1)[0]):
+        for j in range(np.shape(y1)[1]):
+            z1.append(y1[i, j])
+            z2.append(y2[i, j])
+    I = abs(metrics.normalized_mutual_info_score(z1, z2, 'arithmetic'))
     return I
+
+def get_normalized_mutual_info_score(x1, x2):
+    z1 = []
+    z2 = []
+    for i in range(np.shape(x1)[0]):
+        for j in range(np.shape(x1)[1]):
+            z1.append(x1[i, j])
+            z2.append(x2[i, j])
+    I = abs(metrics.normalized_mutual_info_score(z1, z2, 'arithmetic'))
+    return I
+
 
 if __name__ == '__main__':
     # 第一列

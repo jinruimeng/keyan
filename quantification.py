@@ -3,9 +3,10 @@ import math
 
 
 # 量化
+# 根据信噪比和门限制自适应量化
 # input: channelData1-Alice信道数据 channelData2-Bob信道数据
 # output: key1-Alice量化后的密钥 key2-Bob量化后的密钥
-def quantificate(channelData1, channelData2, npower):
+def quantificate(channelData1, channelData2, npower, threshold):
     SNRList = []
     m, n = np.shape(channelData1)
 
@@ -18,9 +19,52 @@ def quantificate(channelData1, channelData2, npower):
 
     for i in range(n):
         SNR = (max(covMatrix1[i, i].real, covMatrix2[i, i].real) / npower) - 1
+        if SNR < 0:
+            SNR = 0.01
         SNR = 10 * np.log10(SNR)
         SNRList.append(SNR)
-        tmpKey = quantificateWithSNR(channelData1[:, i], channelData2[:, i], SNR)
+        tmpKey = quantificateWithSNR(channelData1[:, i], channelData2[:, i], SNR, threshold)
+        key1List.append(tmpKey[0])
+        key2List.append(tmpKey[1])
+
+    for i in range(m):
+        try:
+            for j in range(n):
+                try:
+                    key1 = key1 + key1List[j][i]
+                    key2 = key2 + key2List[j][i]
+                except:
+                    continue
+        except:
+            print(u'超出范围')
+            continue
+
+    length = int(len(key1) / m)
+    return key1, key2, SNRList, length
+
+
+# 量化
+# 根据跟从SNRList2的信噪比进行量化
+# input: channelData1-Alice信道数据 channelData2-Bob信道数据
+# output: key1-Alice量化后的密钥 key2-Bob量化后的密钥
+def quantificate2(channelData1, channelData2, npower, SNRList2, threshold):
+    SNRList = []
+    m, n = np.shape(channelData1)
+
+    key1 = u''
+    key2 = u''
+    covMatrix1 = np.cov(channelData1, rowvar=False)
+    covMatrix2 = np.cov(channelData2, rowvar=False)
+    key1List = []
+    key2List = []
+
+    for i in range(n):
+        SNR = (max(covMatrix1[i, i].real, covMatrix2[i, i].real) / npower) - 1
+        if SNR < 0:
+            SNR = 0.01
+        SNR = 10 * np.log10(SNR)
+        SNRList.append(SNR)
+        tmpKey = quantificateWithSNR(channelData1[:, i], channelData2[:, i], SNRList2[i], threshold)
         key1List.append(tmpKey[0])
         key2List.append(tmpKey[1])
 
@@ -39,49 +83,126 @@ def quantificate(channelData1, channelData2, npower):
     return key1, key2, SNRList
 
 
-def quantificateWithSNR(data1, data2, SNR):
-    # SNR = 10 * np.log10(SNR)
+# 每个比特均匀量化
+def quantificate3(channelData1, channelData2, npower, sumLength):
+    SNRList = []
+    m, n = np.shape(channelData1)
+    length = int(sumLength / n)
+
+    key1 = u''
+    key2 = u''
+    covMatrix1 = np.cov(channelData1, rowvar=False)
+    covMatrix2 = np.cov(channelData2, rowvar=False)
+
+    key1List = []
+    key2List = []
+
+    for i in range(n):
+        SNR = (max(covMatrix1[i, i].real, covMatrix2[i, i].real) / npower) - 1
+        if SNR < 0:
+            SNR = 0.01
+        SNR = 10 * np.log10(SNR)
+        SNRList.append(SNR)
+        tmpKey = quantificateWithBitNum(channelData1[:, i], channelData2[:, i], length)
+        key1List.append(tmpKey[0])
+        key2List.append(tmpKey[1])
+
+    for i in range(m):
+        try:
+            for j in range(n):
+                try:
+                    key1 = key1 + key1List[j][i]
+                    key2 = key2 + key2List[j][i]
+                except:
+                    continue
+        except:
+            print(u'超出范围')
+            continue
+
+    return key1, key2, SNRList
+
+
+# 按照bitList进行量化
+def quantificate4(channelData1, channelData2, bitList):
+    m, n = np.shape(channelData1)
+
+    key1 = u''
+    key2 = u''
+
+    key1List = []
+    key2List = []
+
+    for i in range(n):
+        tmpKey = quantificateWithBitNum(channelData1[:, i], channelData2[:, i], bitList[i])
+        key1List.append(tmpKey[0])
+        key2List.append(tmpKey[1])
+
+    for i in range(m):
+        try:
+            for j in range(n):
+                try:
+                    key1 = key1 + key1List[j][i]
+                    key2 = key2 + key2List[j][i]
+                except:
+                    continue
+        except:
+            print(u'超出范围')
+            continue
+
+    return key1, key2
+
+
+def quantificateWithSNR(data1, data2, SNR, threshold):
+    # if SNR >= 41.4:
+    #     bitNum = 8
+    # else:
+    #     if SNR >= 38.4:
+    #         bitNum = 7
+    #     else:
+    #         if SNR >= 35.4:
+    #             bitNum = 6
+    #         else:
+    #             if SNR >= 32.4:
+    #                 bitNum = 5
+    #             else:
+    #                 if SNR >= 29.7:
+    #                     bitNum = 4
+    #                 else:
+    #                     if SNR >= 26.5:
+    #                         bitNum = 3
+    #                     else:
+    #                         if SNR >= 23.5:
+    #                             bitNum = 2
+    #                         else:
+    #                             if SNR >= 20.5:
+    #                                 bitNum = 1
+    #                             else:
+    #                                 return tmpKey1, tmpKey2
+
+    # if SNR >= 41.4:
+    #     bitNum = 8
+    # else:
+    #     if SNR >= 35.4:
+    #         bitNum = 6
+    #     else:
+    #         if SNR >= 29.7:
+    #             bitNum = 4
+    #         else:
+    #             if SNR >= 23.5:
+    #                 bitNum = 2
+    #             else:
+    #                 return tmpKey1, tmpKey2
+    if SNR < threshold:
+        return [], []
+
+    bitNum = int((SNR - threshold) / 3) + 1
+
+    return quantificateWithBitNum(data1, data2, bitNum)
+
+
+def quantificateWithBitNum(data1, data2, bitNum):
     tmpKey1 = []
     tmpKey2 = []
-
-    if SNR >= 37:
-        bitNum = 12
-    else:
-        if SNR >= 34.5:
-            bitNum = 11
-        else:
-            if SNR >= 31.3:
-                bitNum = 10
-            else:
-                if SNR >= 28.1:
-                    bitNum = 9
-                else:
-                    if SNR >= 25:
-                        bitNum = 8
-                    else:
-                        if SNR >= 22.9:
-                            bitNum = 7
-                        else:
-                            if SNR >= 19.8:
-                                bitNum = 6
-                            else:
-                                if SNR >= 17:
-                                    bitNum = 5
-                                else:
-                                    if SNR >= 14:
-                                        bitNum = 4
-                                    else:
-                                        if SNR >= 10.5:
-                                            bitNum = 3
-                                        else:
-                                            if SNR >= 7:
-                                                bitNum = 2
-                                            else:
-                                                if SNR >= 3:
-                                                    bitNum = 1
-                                                else:
-                                                    return tmpKey1, tmpKey2
-
     # 确定密钥形式，后续可以考虑引入格雷码
     keyFormat = "{0:0" + str(bitNum) + "b}"
     # 寻找最大值和最小值
@@ -91,8 +212,8 @@ def quantificateWithSNR(data1, data2, SNR):
     deta = (maxNum - minNum) / (1 << bitNum)
     m = np.shape(data1)[0]
     for i in range(m):
-        tmpKey1.append(keyFormat.format((int)(((data1[i].real - minNum) / deta) - 0.001)))
-        tmpKey2.append(keyFormat.format((int)(((data2[i].real - minNum) / deta) - 0.001)))
+        tmpKey1.append(keyFormat.format(int(((data1[i].real - minNum) / deta) - 0.001)))
+        tmpKey2.append(keyFormat.format(int(((data2[i].real - minNum) / deta) - 0.001)))
 
     return tmpKey1, tmpKey2
 
@@ -107,7 +228,7 @@ def getInconsistencyRate(key1, key2):
     key1List = list(key1)
     key2List = list(key2)
     errorNum = 0
-    for index in range(len(key1List)):
+    for index in range(np.shape(key1List)[0]):
         if key1List[index] is not key2List[index]:
             errorNum += 1
 
@@ -117,7 +238,7 @@ def getInconsistencyRate(key1, key2):
 # 计算给定数据集的香农墒的函数
 def calc_shannon_ent(data_set):
     # 求list的长度，表示计算参与训练的数据量
-    num_entries = len(data_set)
+    num_entries = np.shape(data_set)[0]
     if num_entries <= 0:
         return 0
     # 计算分类标签label出现的次数
@@ -140,6 +261,4 @@ def calc_shannon_ent(data_set):
 
 
 if __name__ == '__main__':
-    data_set = u'01110101010111101111010100010100001111100010101'
-    shannon_ent = calc_shannon_ent(data_set)
-    print(shannon_ent)
+    print((int)(0.98))

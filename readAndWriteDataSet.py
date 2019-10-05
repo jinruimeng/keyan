@@ -75,16 +75,17 @@ def write(outData, path, suffix=".xlsx"):
                         worksheet.write_string(j, k, tmp)
                         buff += 1
         except:
-            print(u'write1')
             try:
                 h, l = np.shape(outData)
                 worksheet = workbook.add_worksheet()  # 创建sheet
                 for j in range(h):
                     for k in range(l):
-                        tmp = str(outData[j, k])
+                        try:
+                            tmp = str(outData[j, k])
+                        except:
+                            tmp = str(outData[j][k])
                         worksheet.write_string(j, k, tmp)
             except:
-                print(u'write2')
                 m = np.shape(outData)[0]
                 worksheet = workbook.add_worksheet()  # 创建sheet
                 for i in range(m):
@@ -161,8 +162,8 @@ def listToArray(listObj):
 
 # 将密钥输出到txt中
 def writeKey(path, keys1, keys2, SNR, type):
-    name1 = path + u'/key1_' + str(SNR) + u'_' + type + u'.txt'
-    name2 = path + u'/key2_' + str(SNR) + u'_' + type + u'.txt'
+    name1 = path + u'/key1_' + str(SNR) + u'_' + type + u'.dat'
+    name2 = path + u'/key2_' + str(SNR) + u'_' + type + u'.dat'
     data = open(name1, 'w+')
     for key in keys1:
         print(key, file=data)
@@ -175,8 +176,12 @@ def writeKey(path, keys1, keys2, SNR, type):
 
 
 if __name__ == '__main__':
-    datafile = u'E:\\workspace\\keyan\\test.xlsx'
-    dataSet = np.array(excelToMatrixList(datafile))
-    # str = "1+2j"
-    # com = complex(str)
-    # print(com)
+    a = []
+    for i in range(5):
+        tmp = []
+        for j in range(6):
+            tmp.append(j)
+        a.append(tmp)
+
+    m, n = np.shape(a)
+    print(m)
