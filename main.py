@@ -13,7 +13,7 @@ import wt
 centroidNum = 8  # 聚类中心数量
 iRate = 10  # 预处理后保留的维度
 iRate_wt = 10  # 预处理后保留的维度
-SNR_initial = 20
+SNR_initial = 5
 column_initial = 1024  # 初始列数
 
 bit_set_list = [[2, 2, 1, 1, 1, 1, 1, 1, 1, 1], [3, 2, 2, 2, 2, 1, 1, 1, 1, 1], [4, 3, 3, 2, 2, 2, 1, 1, 1, 1], [5, 4, 4, 3, 2, 2, 1, 1, 1, 1], [5, 4, 4, 4, 3, 3, 2, 1, 1, 1], [6, 5, 5, 5, 3, 3, 2, 1, 1, 1], [6, 5, 5, 5, 4, 4, 3, 2, 1, 1], [7, 6, 5, 5, 4, 4, 3, 2, 2, 2], [7, 6, 6, 6, 5, 5, 3, 2, 2, 2], [7, 6, 6, 6, 5, 5, 4, 3, 3, 3], [8, 7, 7, 7, 5, 5, 4, 3, 3, 3], [8, 7, 7, 7, 6, 6, 5, 4, 3, 3], [9, 8, 7, 7, 6, 6, 5, 4, 4, 4]]
@@ -28,17 +28,17 @@ def cluster(channelData_a, channelData_b, iRate, UList_C, clusterAssment_C, ULis
     # 无交互PCA
     newPca1, newPca2 = clusterCore(channelData_a, channelData_b, iRate, [], [], "general")
 
-    # 聚类协方差矩阵
-    newC1, newC2 = clusterCore(channelData_a, channelData_b, iRate, UList_C, clusterAssment_C, "C")
-
-    # 聚类协方差矩阵_代价函数
-    newF1, newF2 = clusterCore(channelData_a, channelData_b, iRate, UList_F, clusterAssment_F, "F")
-
     # wt变换
     newWt1, newWt2 = clusterCore(channelData_a, channelData_b, iRate_wt, [], [], "wt")
 
     # 空间平均分割
     newA1, newA2 = clusterCore(channelData_a, channelData_b, iRate, UList_C, [], "A")
+
+    # 聚类协方差矩阵
+    newC1, newC2 = clusterCore(channelData_a, channelData_b, iRate, UList_C, clusterAssment_C, "C")
+
+    # 聚类协方差矩阵_代价函数
+    newF1, newF2 = clusterCore(channelData_a, channelData_b, iRate, UList_F, clusterAssment_F, "F")
 
     return newPca1, newPca2, newC1, newC2, newF1, newF2, newWt1, newWt2, newA1, newA2
 
@@ -46,12 +46,6 @@ def cluster(channelData_a, channelData_b, iRate, UList_C, clusterAssment_C, ULis
 def clusterCore(channelData_a, channelData_b, iRate, UList, clusterAssment, type):
     newChannelData1 = []
     newChannelData2 = []
-
-    if type == "C" or type == "F":
-        # 变换域
-        for i in range(np.shape(channelData_a)[0]):
-            newChannelData1.append(np.dot(channelData_a[i], UList[(int)(clusterAssment[i, 0].real)]))
-            newChannelData2.append(np.dot(channelData_b[i], UList[(int)(clusterAssment[i, 0].real)]))
 
     if type == "general":
         newChannelData1, UList = pca.pca_general(channelData_a, iRate)
@@ -94,6 +88,12 @@ def clusterCore(channelData_a, channelData_b, iRate, UList, clusterAssment, type
             U2 = (np.transpose(VT)[:, 0:iRate])
             newChannelData2.append(np.dot(channelData_b[i], U2))
 
+        if type == "C" or type == "F":
+            # 变换域
+            for i in range(np.shape(channelData_a)[0]):
+                newChannelData1.append(np.dot(channelData_a[i], UList[(int)(clusterAssment[i, 0].real)]))
+                newChannelData2.append(np.dot(channelData_b[i], UList[(int)(clusterAssment[i, 0].real)]))
+
     return newChannelData1, newChannelData2,
 
 
@@ -107,8 +107,8 @@ if __name__ == '__main__':
     SNR = SNR_initial
 
     # 读入信道数据
-    channelDataPath_a = path + u'channelDataP_a.xlsx'
-    channelDataPath_b = path + u'channelDataP_b.xlsx'
+    channelDataPath_a = path + u'channelDataP_a_RA.xlsx'
+    channelDataPath_b = path + u'channelDataP_b_RA.xlsx'
     channelData_a0 = readAndWriteDataSet.excelToMatrixList(channelDataPath_a)
     channelData_b0 = readAndWriteDataSet.excelToMatrixList(channelDataPath_b)
 
@@ -151,44 +151,45 @@ if __name__ == '__main__':
 
     # 求信噪比和相关系数
     for i in range(p):
+        SNRList = addNoise.get_SNR_list(newPca1[i], newPca2[i], npowers[i])
+        newSNRs_newPca.append(SNRList)
+
+        SNRList = addNoise.get_SNR_list(newWt1[i], newWt2[i], npowers[i])
+        newSNRs_newWt.append(SNRList)
+
+        SNRList = addNoise.get_SNR_list(newA1[i], newA2[i], npowers[i])
+        newSNRs_newA.append(SNRList)
+
         SNRList = addNoise.get_SNR_list(newC1[i], newC2[i], npowers[i])
         newSNRs_newC.append(SNRList)
 
         SNRList = addNoise.get_SNR_list(newF1[i], newF2[i], npowers[i])
         newSNRs_newF.append(SNRList)
 
-        SNRList = addNoise.get_SNR_list(newPca1[i], newPca2[i], npowers[i])
-        newSNRs_newPca.append(SNRList)
-
-        SNRList = addNoise.get_SNR_list(newA1[i], newA2[i], npowers[i])
-        newSNRs_newA.append(SNRList)
-
-        SNRList = addNoise.get_SNR_list(newWt1[i], newWt2[i], npowers[i])
-        newSNRs_newWt.append(SNRList)
-
         tmp_correlation_coefficientsList = []
+        tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newPca1[i], newPca2[i]))
+        tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newWt1[i], newWt2[i]))
+        tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newA1[i], newA2[i]))
         tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newC1[i], newC2[i]))
         tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newF1[i], newF2[i]))
-        tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newPca1[i], newPca2[i]))
-        tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newA1[i], newA2[i]))
-        tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(newWt1[i], newWt2[i]))
         tmp_correlation_coefficientsList.append(tools.getCorrelation_coefficientsList(channelData_a[i], channelData_b[i])[0:iRate])
         correlation_coefficientsList.append(tools.listToArray(tmp_correlation_coefficientsList))
 
-        normalized_mutual_info_score[0, p] = getDistance.get_normalized_mutual_info_score(newC1[i], newC2[i])
-        normalized_mutual_info_score[1, p] = getDistance.get_normalized_mutual_info_score(newF1[i], newF2[i])
-        normalized_mutual_info_score[2, p] = getDistance.get_normalized_mutual_info_score(newPca1[i], newPca2[i])
-        normalized_mutual_info_score[3, p] = getDistance.get_normalized_mutual_info_score(newA1[i], newA2[i])
-        normalized_mutual_info_score[4, p] = getDistance.get_normalized_mutual_info_score(newWt1[i], newWt2[i])
-        normalized_mutual_info_score[5, p] = getDistance.get_normalized_mutual_info_score(channelData_a[i], channelData_b[i])
+        normalized_mutual_info_score[0, i] = getDistance.costFunction(newPca1[i], newPca2[i], np.identity(np.shape(newPca1[i])[1]), npowers[i])
+        normalized_mutual_info_score[1, i] = getDistance.costFunction(newWt1[i], newWt2[i], np.identity(np.shape(newWt1[i])[1]), npowers[i])
+        normalized_mutual_info_score[2, i] = getDistance.costFunction(newA1[i], newA2[i], np.identity(np.shape(newA1[i])[1]), npowers[i])
+        normalized_mutual_info_score[3, i] = getDistance.costFunction(newC1[i], newC2[i], np.identity(np.shape(newC1[i])[1]), npowers[i])
+        normalized_mutual_info_score[4, i] = getDistance.costFunction(newF1[i], newF2[i], np.identity(np.shape(newF1[i])[1]), npowers[i])
+        normalized_mutual_info_score[5, i] = getDistance.costFunction(channelData_a[i], channelData_b[i], np.identity(np.shape(channelData_a[i])[1]), npowers[i])
 
     readAndWriteDataSet.write(correlation_coefficientsList, path + u'correlation_coefficient')
+    readAndWriteDataSet.write(normalized_mutual_info_score, path + u'normalized_mutual_info_score')
+
     readAndWriteDataSet.write(tools.listToArray(newSNRs_newPca), path + u'newSNRs_newPca')
-    readAndWriteDataSet.write(tools.listToArray(newSNRs_newC), path + u'newSNRs_newC')
-    readAndWriteDataSet.write(tools.listToArray(newSNRs_newF), path + u'newSNRs_newF')
     readAndWriteDataSet.write(tools.listToArray(newSNRs_newWt), path + u'newSNRs_newWt')
     readAndWriteDataSet.write(tools.listToArray(newSNRs_newA), path + u'newSNRs_newA')
-    readAndWriteDataSet.write(normalized_mutual_info_score, path + u'normalized_mutual_info_score')
+    readAndWriteDataSet.write(tools.listToArray(newSNRs_newC), path + u'newSNRs_newC')
+    readAndWriteDataSet.write(tools.listToArray(newSNRs_newF), path + u'newSNRs_newF')
 
     bit_error_rate_all = np.zeros((6, np.shape(bit_set_num)[0]))
     for k in range(np.shape(bit_set_num)[0]):
@@ -198,21 +199,21 @@ if __name__ == '__main__':
 
         key_newPca1 = []
         key_newPca2 = []
-        key_newC1 = []
-        key_newC2 = []
-        key_newF1 = []
-        key_newF2 = []
         key_newWt1 = []
         key_newWt2 = []
         key_newA1 = []
         key_newA2 = []
+        key_newC1 = []
+        key_newC2 = []
+        key_newF1 = []
+        key_newF2 = []
         key_old1 = []
         key_old2 = []
 
         for i in range(p):
-            tmpKey1, tmpKey2 = quantification.quantificate4(newC1[i], newC2[i], bit_set_list[k])
-            key_newC1.append(tmpKey1)
-            key_newC2.append(tmpKey2)
+            tmpKey1, tmpKey2 = quantification.quantificate4(newPca1[i], newPca2[i], bit_set_list[k])
+            key_newPca1.append(tmpKey1)
+            key_newPca2.append(tmpKey2)
             keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
             lengths[0, i] += keyLength
             errorNums[0, i] += errorNum
@@ -221,9 +222,9 @@ if __name__ == '__main__':
             except:
                 bit_error_rate[0, i] = 0
 
-            tmpKey1, tmpKey2 = quantification.quantificate4(newF1[i], newF2[i], bit_set_list[k])
-            key_newF1.append(tmpKey1)
-            key_newF2.append(tmpKey2)
+            tmpKey1, tmpKey2 = quantification.quantificate4(newWt1[i], newWt2[i], bit_set_list[k])
+            key_newWt1.append(tmpKey1)
+            key_newWt2.append(tmpKey2)
             keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
             lengths[1, i] += keyLength
             errorNums[1, i] += errorNum
@@ -232,9 +233,9 @@ if __name__ == '__main__':
             except:
                 bit_error_rate[1, i] = 0
 
-            tmpKey1, tmpKey2 = quantification.quantificate4(newPca1[i], newPca2[i], bit_set_list[k])
-            key_newPca1.append(tmpKey1)
-            key_newPca2.append(tmpKey2)
+            tmpKey1, tmpKey2 = quantification.quantificate4(newA1[i], newA2[i], bit_set_list[k])
+            key_newA1.append(tmpKey1)
+            key_newA2.append(tmpKey2)
             keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
             lengths[2, i] += keyLength
             errorNums[2, i] += errorNum
@@ -243,9 +244,9 @@ if __name__ == '__main__':
             except:
                 bit_error_rate[2, i] = 0
 
-            tmpKey1, tmpKey2 = quantification.quantificate4(newA1[i], newA2[i], bit_set_list[k])
-            key_newA1.append(tmpKey1)
-            key_newA2.append(tmpKey2)
+            tmpKey1, tmpKey2 = quantification.quantificate4(newC1[i], newC2[i], bit_set_list[k])
+            key_newC1.append(tmpKey1)
+            key_newC2.append(tmpKey2)
             keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
             lengths[3, i] += keyLength
             errorNums[3, i] += errorNum
@@ -254,9 +255,9 @@ if __name__ == '__main__':
             except:
                 bit_error_rate[3, i] = 0
 
-            tmpKey1, tmpKey2 = quantification.quantificate4(newWt1[i], newWt2[i], bit_set_list[k])
-            key_newWt1.append(tmpKey1)
-            key_newWt2.append(tmpKey2)
+            tmpKey1, tmpKey2 = quantification.quantificate4(newF1[i], newF2[i], bit_set_list[k])
+            key_newF1.append(tmpKey1)
+            key_newF2.append(tmpKey2)
             keyLength, errorNum = quantification.getInconsistencyRate(tmpKey1, tmpKey2)
             lengths[4, i] += keyLength
             errorNums[4, i] += errorNum
@@ -279,22 +280,18 @@ if __name__ == '__main__':
             except:
                 bit_error_rate[5, i] = 0
 
-        bit_error_rate_all[0, k] = mean(bit_error_rate[0, :])
-        bit_error_rate_all[1, k] = mean(bit_error_rate[1, :])
-        bit_error_rate_all[2, k] = mean(bit_error_rate[2, :])
-        bit_error_rate_all[3, k] = mean(bit_error_rate[3, :])
-        bit_error_rate_all[4, k] = mean(bit_error_rate[4, :])
-        bit_error_rate_all[5, k] = mean(bit_error_rate[5, :])
+        for i in range(6):
+            bit_error_rate_all[i, k] = mean(bit_error_rate[i, :])
 
         # readAndWriteDataSet.writeKey(path, key_newPca1, key_newPca2, SNR, u'pca_' + str(bit_set_num[k]))
-
-        # readAndWriteDataSet.writeKey(path, key_newC1, key_newC2, SNR, u'C_' + str(bit_set_num[k]))
-
-        # readAndWriteDataSet.writeKey(path, key_newF1, key_newF2, SNR, u'F_' + str(bit_set_num[k]))
 
         # readAndWriteDataSet.writeKey(path, key_newWt1, key_newWt2, SNR, u'wt_' + str(bit_set_num[k]))
 
         # readAndWriteDataSet.writeKey(path, key_newA1, key_newA2, SNR, u'A_' + str(bit_set_num[k]))
+
+        # readAndWriteDataSet.writeKey(path, key_newC1, key_newC2, SNR, u'C_' + str(bit_set_num[k]))
+
+        # readAndWriteDataSet.writeKey(path, key_newF1, key_newF2, SNR, u'F_' + str(bit_set_num[k]))
 
         # readAndWriteDataSet.writeKey(path, key_old1, key_old2, SNR, u'old_' + str(bit_set_num[k]))
 

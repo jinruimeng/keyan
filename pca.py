@@ -97,10 +97,10 @@ def pca_general(data, iRate):
         covMatrix = np.cov(data, rowvar=False)
         # SVD分解协方差矩阵得出变换矩阵
         U, Sigma, VT = np.linalg.svd(covMatrix)
+        print(u'pca_general_single')
         return np.dot(data, np.transpose(VT)[:, 0:iRate]), np.transpose(VT)[:, 0:iRate]
 
     except:
-        print(u'pca_general')
         # 如果输入是列表，进行以下步骤
         out = []
         covList = tools.getCovMatrixList(data)

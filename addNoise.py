@@ -15,7 +15,6 @@ import numpy as np
 
 # 获得噪声功率
 def get_npower(covList):
-    # 单位转换: dB到倍数
     p, m, n = np.shape(covList)
     npowers = []
     for i in range(p):
@@ -45,4 +44,6 @@ def get_SNR_list(channelData1, channelData2, npower):
 
 if __name__ == '__main__':
     # 路径配置
-    path = u'/Users/jinruimeng/Downloads/keyan/'  # path = u'E:\\workspace\\keyan\\'
+    path = u'/Users/jinruimeng/Downloads/keyan/'
+
+    # path = u'E:\\workspace\\keyan\\'

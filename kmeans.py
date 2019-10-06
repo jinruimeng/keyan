@@ -88,7 +88,7 @@ def KMeansOushi_costFunction(dataSet, dataSet2, covs, centroidNum, npower, iRate
     for i in range(centroidNum):
         U, Sigma, VT = np.linalg.svd(centroidList[i])
         UList.append(np.transpose(VT)[:, 0:iRate])
-    while clusterChange and count <= 1000:
+    while clusterChange and count <= 10:
         count += 1
         print("第" + str(count) + "次寻找聚类中心！")
         clusterChange = False

@@ -45,40 +45,51 @@ def oushiDistance(x, y):
 def costFunction(x1, x2, U, npower):
     y1 = np.dot(x1, U)
     y2 = np.dot(x2, U)
-    # U, Sigma, VT = np.linalg.svd(np.cov(y1, y2, rowvar=False))
-    # I = 0
-    # for i in range(len(Sigma)):
-    #     tmp_npower = min(npower, Sigma[i])
-    #     A = ((Sigma[i] - tmp_npower) / Sigma[i]) ** 2
-    #     B = (1 - A) ** (-1)
-    #     I += math.log(B, 2)
-    z1 = []
-    z2 = []
-    for i in range(np.shape(y1)[0]):
-        for j in range(np.shape(y1)[1]):
-            z1.append(y1[i, j])
-            z2.append(y2[i, j])
-    I = abs(metrics.normalized_mutual_info_score(z1, z2, 'arithmetic'))
+    U, Sigma, VT = np.linalg.svd(np.cov(y1, y2, rowvar=False))
+    I = 0
+    for i in range(len(Sigma)):
+        tmp_npower = min(npower, Sigma[i])
+        A = ((Sigma[i] - tmp_npower) / Sigma[i]) ** 2
+        B = (1 - A) ** (-1)
+        I += math.log(B, 2)
+    # z1 = []
+    # z2 = []
+    # for i in range(np.shape(y1)[0]):
+    #     for j in range(np.shape(y1)[1]):
+    #         z1.append(y1[i, j])
+    #         z2.append(y2[i, j])
+    # I = abs(metrics.normalized_mutual_info_score(z1, z2, 'arithmetic'))
     return I
 
-def get_normalized_mutual_info_score(x1, x2):
-    z1 = []
-    z2 = []
-    for i in range(np.shape(x1)[0]):
-        for j in range(np.shape(x1)[1]):
-            z1.append(x1[i, j])
-            z2.append(x2[i, j])
-    I = abs(metrics.normalized_mutual_info_score(z1, z2, 'arithmetic'))
-    return I
+
+# def get_normalized_mutual_info_score(x1, x2, npower):
+#     U, Sigma, VT = np.linalg.svd(np.cov(x1, x2, rowvar=False))
+#     I = 0
+#     for i in range(len(Sigma)):
+#         tmp_npower = min(npower, Sigma[i])
+#         A = ((Sigma[i] - tmp_npower) / Sigma[i]) ** 2
+#         B = (1 - A) ** (-1)
+#         I += math.log(B, 2)
+#
+#     z1 = []
+#     z2 = []
+#     for i in range(np.shape(x1)[0]):
+#         for j in range(np.shape(x1)[1]):
+#             z1.append(x1[i, j])
+#             z2.append(x2[i, j])
+#     I = abs(metrics.normalized_mutual_info_score(z1, z2, 'arithmetic'))
+#     return I
 
 
 if __name__ == '__main__':
     # 第一列
-    x = [3, 5, 2, 8]
+    x = [3, 5, 2, 4]
 
     # 第二列
-    y = [4, 6, 2, 4]
+    y = [3, 5, 2, 6]
 
-    z = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
-    cov = np.cov(z, rowvar=False)
-    print(cov)
+    I = abs(metrics.normalized_mutual_info_score(x, y, 'arithmetic'))
+
+    # z = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
+    # cov = np.cov(z, rowvar=False)
+    print(I)
