@@ -2,6 +2,7 @@ import numpy as np
 import math
 import readAndWriteDataSet
 import copy
+import tools
 from sklearn import metrics
 
 
@@ -45,13 +46,27 @@ def oushiDistance(x, y):
 def costFunction(x1, x2, U, npower):
     y1 = np.dot(x1, U)
     y2 = np.dot(x2, U)
-    U, Sigma, VT = np.linalg.svd(np.cov(y1, y2, rowvar=False))
-    I = 0
-    for i in range(len(Sigma)):
-        tmp_npower = min(npower, Sigma[i])
-        A = ((Sigma[i] - tmp_npower) / Sigma[i]) ** 2
-        B = (1 - A) ** (-1)
-        I += math.log(B, 2)
+    Raa = np.dot(np.mat(y1).H, np.mat(y1))
+    Rbb = np.dot(np.mat(y2).H, np.mat(y2))
+    Rab = np.dot(np.mat(y1).H, np.mat(y2))
+    Rba = np.dot(np.mat(y2).H, np.mat(y1))
+    A = np.dot(np.dot(Rab, np.linalg.inv(Raa)), Rba)
+    B = Rbb - A
+    C = np.linalg.det(Rbb) / np.linalg.det(B)
+    I = math.log2(C) / (np.shape(y1)[1])
+    return I
+
+    # Is = []
+    # for i in range(np.shape(y1)[0]):
+    #     z = np.vstack((y1[i, :], y2[i, :]))
+    #     U, Sigma, VT = np.linalg.svd(np.cov(z, rowvar=False))
+    #     I = 0
+    #     for i in range(len(Sigma)):
+    #         tmp_npower = min(npower, Sigma[i])
+    #         A = ((Sigma[i] - tmp_npower) / Sigma[i]) ** 2
+    #         B = (1 - A) ** (-1)
+    #         I += math.log(B, 2)
+    #     Is.append(I / np.shape(y1)[1])
     # z1 = []
     # z2 = []
     # for i in range(np.shape(y1)[0]):
@@ -59,7 +74,7 @@ def costFunction(x1, x2, U, npower):
     #         z1.append(y1[i, j])
     #         z2.append(y2[i, j])
     # I = abs(metrics.normalized_mutual_info_score(z1, z2, 'arithmetic'))
-    return I
+    # return np.mean(Is)
 
 
 # def get_normalized_mutual_info_score(x1, x2, npower):
@@ -83,13 +98,17 @@ def costFunction(x1, x2, U, npower):
 
 if __name__ == '__main__':
     # 第一列
-    x = [3, 5, 2, 4]
-
+    x = [[1, 2, 3, 4], [-1, -2, -3, -4]]
+    x = tools.listToArray(x)
     # 第二列
-    y = [3, 5, 2, 6]
+    y = [[1, -1, 1, -1], [-1, 1, -1, 1]]
+    y = tools.listToArray(y)
 
-    I = abs(metrics.normalized_mutual_info_score(x, y, 'arithmetic'))
+    # z = np.vstack((x[1, :], y[1, :]))
+    c = np.cov(y, rowvar=False)
+
+    # I = abs(metrics.normalized_mutual_info_score(x,'arithmetic'))
 
     # z = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
     # cov = np.cov(z, rowvar=False)
-    print(I)
+    print("end")

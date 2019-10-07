@@ -10,10 +10,10 @@ import addNoise
 import pca
 import wt
 
-centroidNum = 8  # 聚类中心数量
+centroidNum = 2  # 聚类中心数量
 iRate = 10  # 预处理后保留的维度
 iRate_wt = 10  # 预处理后保留的维度
-SNR_initial = 5
+SNR_initial = 10
 column_initial = 1024  # 初始列数
 
 bit_set_list = [[2, 2, 1, 1, 1, 1, 1, 1, 1, 1], [3, 2, 2, 2, 2, 1, 1, 1, 1, 1], [4, 3, 3, 2, 2, 2, 1, 1, 1, 1], [5, 4, 4, 3, 2, 2, 1, 1, 1, 1], [5, 4, 4, 4, 3, 3, 2, 1, 1, 1], [6, 5, 5, 5, 3, 3, 2, 1, 1, 1], [6, 5, 5, 5, 4, 4, 3, 2, 1, 1], [7, 6, 5, 5, 4, 4, 3, 2, 2, 2], [7, 6, 6, 6, 5, 5, 3, 2, 2, 2], [7, 6, 6, 6, 5, 5, 4, 3, 3, 3], [8, 7, 7, 7, 5, 5, 4, 3, 3, 3], [8, 7, 7, 7, 6, 6, 5, 4, 3, 3], [9, 8, 7, 7, 6, 6, 5, 4, 4, 4]]
@@ -88,11 +88,11 @@ def clusterCore(channelData_a, channelData_b, iRate, UList, clusterAssment, type
             U2 = (np.transpose(VT)[:, 0:iRate])
             newChannelData2.append(np.dot(channelData_b[i], U2))
 
-        if type == "C" or type == "F":
-            # 变换域
-            for i in range(np.shape(channelData_a)[0]):
-                newChannelData1.append(np.dot(channelData_a[i], UList[(int)(clusterAssment[i, 0].real)]))
-                newChannelData2.append(np.dot(channelData_b[i], UList[(int)(clusterAssment[i, 0].real)]))
+    if type == "C" or type == "F":
+        # 变换域
+        for i in range(np.shape(channelData_a)[0]):
+            newChannelData1.append(np.dot(channelData_a[i], UList[(int)(clusterAssment[i, 0].real)]))
+            newChannelData2.append(np.dot(channelData_b[i], UList[(int)(clusterAssment[i, 0].real)]))
 
     return newChannelData1, newChannelData2,
 
@@ -149,6 +149,10 @@ if __name__ == '__main__':
     newSNRs_newWt = []
     newSNRs_newA = []
 
+    readAndWriteDataSet.write(newC2, path + u'newC1')
+    readAndWriteDataSet.write(newWt1, path + u'newWt1')
+    readAndWriteDataSet.write(newA2, path + u'newA2')
+
     # 求信噪比和相关系数
     for i in range(p):
         SNRList = addNoise.get_SNR_list(newPca1[i], newPca2[i], npowers[i])
@@ -182,14 +186,14 @@ if __name__ == '__main__':
         normalized_mutual_info_score[4, i] = getDistance.costFunction(newF1[i], newF2[i], np.identity(np.shape(newF1[i])[1]), npowers[i])
         normalized_mutual_info_score[5, i] = getDistance.costFunction(channelData_a[i], channelData_b[i], np.identity(np.shape(channelData_a[i])[1]), npowers[i])
 
-    readAndWriteDataSet.write(correlation_coefficientsList, path + u'correlation_coefficient')
-    readAndWriteDataSet.write(normalized_mutual_info_score, path + u'normalized_mutual_info_score')
+    # readAndWriteDataSet.write(correlation_coefficientsList, path + u'correlation_coefficient')
+    # readAndWriteDataSet.write(normalized_mutual_info_score, path + u'normalized_mutual_info_score')
 
-    readAndWriteDataSet.write(tools.listToArray(newSNRs_newPca), path + u'newSNRs_newPca')
-    readAndWriteDataSet.write(tools.listToArray(newSNRs_newWt), path + u'newSNRs_newWt')
-    readAndWriteDataSet.write(tools.listToArray(newSNRs_newA), path + u'newSNRs_newA')
-    readAndWriteDataSet.write(tools.listToArray(newSNRs_newC), path + u'newSNRs_newC')
-    readAndWriteDataSet.write(tools.listToArray(newSNRs_newF), path + u'newSNRs_newF')
+    # readAndWriteDataSet.write(tools.listToArray(newSNRs_newPca), path + u'newSNRs_newPca')
+    # readAndWriteDataSet.write(tools.listToArray(newSNRs_newWt), path + u'newSNRs_newWt')
+    # readAndWriteDataSet.write(tools.listToArray(newSNRs_newA), path + u'newSNRs_newA')
+    # readAndWriteDataSet.write(tools.listToArray(newSNRs_newC), path + u'newSNRs_newC')
+    # readAndWriteDataSet.write(tools.listToArray(newSNRs_newF), path + u'newSNRs_newF')
 
     bit_error_rate_all = np.zeros((6, np.shape(bit_set_num)[0]))
     for k in range(np.shape(bit_set_num)[0]):
